@@ -1,7 +1,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import dts from "vite-plugin-dts";
-import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const entry = fileURLToPath(new URL("./src/index.ts", import.meta.url));
 
 export default defineConfig({
   plugins: [
@@ -10,7 +12,7 @@ export default defineConfig({
   ],
   build: {
     lib: {
-      entry: resolve(__dirname, "src/index.ts"),
+      entry,
       name: "GitLabTracker",
       fileName: (format) => (format === "es" ? "index.js" : "index.cjs"),
       formats: ["es", "cjs"],
@@ -23,7 +25,11 @@ export default defineConfig({
           "react-dom": "ReactDOM",
           "react/jsx-runtime": "react/jsx-runtime",
         },
-        assetFileNames: (info) => (info.name === "style.css" ? "tracker.css" : info.name!),
+        assetFileNames: (info) => {
+          const first = info.names?.[0];
+          if (first === "style.css") return "tracker.css";
+          return first ?? "[name][extname]";
+        },
       },
     },
     sourcemap: true,
