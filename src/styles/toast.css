@@ -1,0 +1,19 @@
+.tracker-toast-tray {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  display: flex; flex-direction: column; gap: 10px;
+  z-index: 9999;
+}
+.tracker-toast {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border-radius: var(--r-2);
+  box-shadow: var(--shadow-lg);
+  color: var(--ink);
+  font-size: 13px;
+}
+.tracker-toast--error { border-left: 3px solid var(--blocked); }
+.tracker-toast--info  { border-left: 3px solid var(--accent); }
+.tracker-toast--undo  { border-left: 3px solid var(--warn); }
+.tracker-toast button { background: transparent; border: 0; color: inherit; cursor: pointer; }
