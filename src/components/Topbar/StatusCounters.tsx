@@ -1,3 +1,4 @@
+import { useDroppable } from "@dnd-kit/core";
 import type { Flag } from "../../types/tracker";
 
 export interface CountersProps {
@@ -8,12 +9,19 @@ export interface CountersProps {
   onToggle: (which: Flag | "cancelled") => void;
 }
 
-export function StatusCounters({ blocked, reviewing, cancelled, active, onToggle }: CountersProps) {
-  const Btn = ({ id, count, label }: { id: Flag | "cancelled"; count: number; label: string }) => (
+function CounterBtn({ id, count, label, active, onClick }: {
+  id: Flag | "cancelled"; count: number; label: string; active: boolean; onClick: () => void;
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `counter:${id}`,
+    data: { kind: "counter", flag: id },
+  });
+  return (
     <button
-      className={`tracker-counter${active === id ? " is-active" : ""}`}
+      ref={setNodeRef}
+      className={`tracker-counter${active ? " is-active" : ""}${isOver ? " is-hover" : ""}`}
       data-flag={id}
-      onClick={() => onToggle(id)}
+      onClick={onClick}
       type="button"
     >
       <span className="tracker-counter__dot" />
@@ -21,11 +29,14 @@ export function StatusCounters({ blocked, reviewing, cancelled, active, onToggle
       <span>{label}</span>
     </button>
   );
+}
+
+export function StatusCounters({ blocked, reviewing, cancelled, active, onToggle }: CountersProps) {
   return (
     <div className="tracker-counters">
-      <Btn id="blocked" count={blocked} label="blocked" />
-      <Btn id="reviewing" count={reviewing} label="reviewing" />
-      <Btn id="cancelled" count={cancelled} label="cancelled" />
+      <CounterBtn id="blocked" count={blocked} label="blocked" active={active === "blocked"} onClick={() => onToggle("blocked")} />
+      <CounterBtn id="reviewing" count={reviewing} label="reviewing" active={active === "reviewing"} onClick={() => onToggle("reviewing")} />
+      <CounterBtn id="cancelled" count={cancelled} label="cancelled" active={active === "cancelled"} onClick={() => onToggle("cancelled")} />
     </div>
   );
 }
