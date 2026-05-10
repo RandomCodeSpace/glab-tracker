@@ -1,3 +1,4 @@
+import { useDraggable } from "@dnd-kit/core";
 import type { Issue } from "../../types/tracker";
 import { CardLabels } from "./CardLabels";
 import { CardMeta } from "./CardMeta";
@@ -6,18 +7,25 @@ import { FlagHeader } from "./FlagHeader";
 export interface CardProps {
   issue: Issue;
   sourceUrl: string | null;
-  onSelect?: () => void;
-  onClearFlag?: (flag: "blocked" | "reviewing") => void;
-  onOpenNotes?: () => void;
-  isActive?: boolean;
+  onSelect?: (() => void) | undefined;
+  onClearFlag?: ((flag: "blocked" | "reviewing") => void) | undefined;
+  onOpenNotes?: (() => void) | undefined;
+  isActive?: boolean | undefined;
 }
 
 export function Card({ issue, sourceUrl, onSelect, onClearFlag, onOpenNotes, isActive }: CardProps) {
   const blocked = issue.flags.has("blocked");
   const reviewing = issue.flags.has("reviewing");
+  const { setNodeRef, listeners, attributes, isDragging } = useDraggable({
+    id: `issue:${issue.iid}`,
+    data: { iid: issue.iid, kind: "issue" },
+  });
   return (
     <article
-      className={`tracker-card${isActive ? " is-active" : ""}`}
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      className={`tracker-card${isActive ? " is-active" : ""}${isDragging ? " is-dragging" : ""}`}
       data-blocked={blocked || undefined}
       data-reviewing={reviewing || undefined}
       onClick={onSelect}

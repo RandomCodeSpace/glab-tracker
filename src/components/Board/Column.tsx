@@ -1,3 +1,4 @@
+import { useDroppable } from "@dnd-kit/core";
 import type { Issue, ColumnState } from "../../types/tracker";
 import { Card } from "../Card/Card";
 
@@ -14,6 +15,10 @@ export interface ColumnProps {
 }
 
 export function Column(props: ColumnProps) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: `column:${props.state}`,
+    data: { kind: "column", state: props.state },
+  });
   return (
     <div className="tracker-col" data-state={props.state}>
       <div className="tracker-col__head">
@@ -25,7 +30,7 @@ export function Column(props: ColumnProps) {
           </span>
         )}
       </div>
-      <div className="tracker-col__list">
+      <div className={`tracker-col__list${isOver ? " is-over" : ""}`} ref={setNodeRef}>
         {props.issues.map((i) => (
           <Card
             key={i.iid}
