@@ -1,0 +1,81 @@
+.tracker {
+  color-scheme: light;
+
+  --canvas: #d8d0bd;
+  --surface: #e8e1ce;
+  --surface-2: #c8c0aa;
+  --line: rgba(26, 24, 16, 0.10);
+  --line-strong: rgba(26, 24, 16, 0.20);
+  --ink: #1a1810;
+  --ink-2: #5b5544;
+  --ink-3: #8a8470;
+  --ink-4: #b3ad99;
+
+  --accent: #1d3da8;
+  --accent-fg: #e8e1ce;
+  --accent-soft: rgba(29, 61, 168, 0.10);
+  --accent-ring: rgba(29, 61, 168, 0.26);
+
+  --blocked: #a8341c;
+  --blocked-soft: rgba(168, 52, 28, 0.12);
+  --blocked-glow: rgba(168, 52, 28, 0.26);
+  --reviewing: #1d6e7a;
+  --reviewing-soft: rgba(29, 110, 122, 0.12);
+  --reviewing-glow: rgba(29, 110, 122, 0.26);
+  --cancelled-mut: #5b5544;
+  --cancelled-soft: rgba(91, 85, 68, 0.10);
+  --cancelled-glow: rgba(91, 85, 68, 0.22);
+
+  --warn: #8b4a09;
+  --info: #1d6e7a;
+  --done: #1c6635;
+
+  --shadow-sm: 0 1px 1px rgba(26, 24, 16, 0.08), 0 0 0 1px rgba(26, 24, 16, 0.06);
+  --shadow:    0 1px 2px rgba(26, 24, 16, 0.08), 0 4px 14px rgba(26, 24, 16, 0.10), 0 0 0 1px rgba(26, 24, 16, 0.06);
+  --shadow-lg: 0 1px 2px rgba(26, 24, 16, 0.08), 0 12px 28px rgba(26, 24, 16, 0.14), 0 36px 72px rgba(26, 24, 16, 0.12), 0 0 0 1px rgba(26, 24, 16, 0.06);
+  --shadow-drawer: -22px 0 50px -28px rgba(26, 24, 16, 0.30), 0 0 0 1px rgba(26, 24, 16, 0.08);
+  --shadow-drag: 0 16px 36px rgba(26, 24, 16, 0.28), 0 4px 12px rgba(26, 24, 16, 0.18), 0 0 0 1px rgba(26, 24, 16, 0.10);
+  --shadow-pop: 0 1px 2px rgba(26, 24, 16, 0.12), 0 18px 38px rgba(26, 24, 16, 0.20), 0 0 0 1px rgba(26, 24, 16, 0.08);
+
+  --r-1: 6px;
+  --r-2: 10px;
+  --r-3: 14px;
+  --r-4: 20px;
+
+  --sans: "Geist", "Inter Tight", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mono: "Geist Mono", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --hue-blue-bg:    rgba(29, 61, 168, 0.12);
+  --hue-blue-fg:    #1d3490;
+  --hue-blue-on:    #e8e1ce;
+  --hue-violet-bg:  rgba(115, 50, 200, 0.12);
+  --hue-violet-fg:  #4d1f9e;
+  --hue-violet-on:  #e8e1ce;
+  --hue-pink-bg:    rgba(180, 50, 105, 0.12);
+  --hue-pink-fg:    #8c1351;
+  --hue-pink-on:    #e8e1ce;
+  --hue-amber-bg:   rgba(166, 80, 14, 0.14);
+  --hue-amber-fg:   #6f3007;
+  --hue-amber-on:   #e8e1ce;
+  --hue-green-bg:   rgba(28, 102, 53, 0.13);
+  --hue-green-fg:   #145528;
+  --hue-green-on:   #e8e1ce;
+  --hue-teal-bg:    rgba(29, 110, 122, 0.13);
+  --hue-teal-fg:    #1d6e7a;
+  --hue-teal-on:    #e8e1ce;
+  --hue-slate-bg:   rgba(26, 24, 16, 0.10);
+  --hue-slate-fg:   #2a2419;
+  --hue-slate-on:   #e8e1ce;
+}
+
+.tracker, .tracker * { box-sizing: border-box; }
+.tracker {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
