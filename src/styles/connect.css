@@ -1,0 +1,106 @@
+.tracker-connect-frame {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--canvas) 100%);
+}
+
+.tracker-connect {
+  max-width: 540px;
+  margin: 80px auto 100px;
+  padding: 0 28px;
+}
+.tracker-connect__mark {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0855ff 0%, #6a3dff 100%);
+  box-shadow: 0 6px 18px rgba(8, 85, 255, 0.30), inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  margin-bottom: 22px;
+}
+.tracker-connect__title {
+  font-size: 30px; font-weight: 600;
+  letter-spacing: -0.022em;
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+.tracker-connect__lede {
+  color: var(--ink-2);
+  margin: 0 0 32px;
+  font-size: 14.5px; line-height: 1.55;
+}
+
+.tracker-connect__steps {
+  background: var(--surface);
+  border-radius: var(--r-3);
+  box-shadow: var(--shadow);
+  padding: 4px 0;
+  margin: 0;
+  list-style: none;
+}
+.tracker-connect__step {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 14px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+.tracker-connect__step:last-child { border-bottom: 0; }
+
+.tracker-connect__num {
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding-top: 3px;
+}
+.tracker-connect__step.is-done .tracker-connect__num { color: var(--done); }
+.tracker-connect__step.is-current .tracker-connect__num { color: var(--accent); }
+
+.tracker-connect__step-title {
+  font-size: 14.5px; font-weight: 600;
+  margin: 0 0 4px;
+  letter-spacing: -0.008em;
+}
+.tracker-connect__step-desc {
+  color: var(--ink-2);
+  margin: 0 0 10px;
+  font-size: 13px; line-height: 1.55;
+}
+.tracker-connect__ok {
+  color: var(--done); font-family: var(--mono); font-size: 11.5px;
+}
+
+.tracker-connect__field {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 10px;
+}
+.tracker-connect__field input {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  outline: 0;
+  padding: 9px 12px;
+  color: var(--ink); font: inherit;
+  font-size: 14px;
+  font-family: var(--mono);
+}
+.tracker-connect__field input:focus {
+  border-color: var(--accent-ring); background: var(--surface);
+}
+
+.tracker-connect__go {
+  background: var(--accent); color: var(--accent-fg);
+  border: 0; padding: 9px 16px;
+  border-radius: var(--r-1);
+  font: inherit; font-weight: 600;
+  font-size: 13px; cursor: pointer;
+  box-shadow: 0 1px 2px rgba(8, 85, 255, 0.20), inset 0 0 0 1px rgba(255, 255, 255, 0.10);
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+.tracker-connect__go:active { transform: scale(0.985); }
+.tracker-connect__go:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.tracker-connect__error {
+  color: var(--blocked);
+  font-size: 12.5px;
+  margin-top: 10px;
+  font-family: var(--mono);
+}

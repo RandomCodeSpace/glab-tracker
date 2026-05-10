@@ -27,7 +27,7 @@ export default defineConfig({
         },
         assetFileNames: (info) => {
           const first = info.names?.[0];
-          if (first === "style.css") return "tracker.css";
+          if (first && first.endsWith(".css")) return "tracker.css";
           return first ?? "[name][extname]";
         },
       },

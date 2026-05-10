@@ -1,0 +1,158 @@
+.tracker-popover {
+  position: absolute;
+  width: 320px;
+  background: var(--surface);
+  border-radius: var(--r-3);
+  box-shadow: var(--shadow-pop);
+  padding: 4px 0 0;
+  overflow: hidden;
+  left: var(--tracker-popover-x, 0);
+  top: var(--tracker-popover-y, 0);
+  z-index: 10;
+}
+.tracker-popover::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 24px;
+  width: 12px; height: 12px;
+  background: var(--surface);
+  border-left: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+  transform: rotate(45deg);
+}
+
+.tracker-popover__head {
+  display: flex; align-items: center; gap: 6px;
+  padding: 14px 16px 10px;
+}
+.tracker-popover__title {
+  font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--ink-3);
+  font-weight: 700;
+}
+.tracker-popover__count {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--ink-2);
+}
+
+.tracker-popover__list { display: flex; flex-direction: column; }
+.tracker-popover__entry {
+  padding: 10px 16px;
+  border-top: 1px solid var(--line);
+}
+.tracker-popover__entry:first-child { border-top: 0; }
+.tracker-popover__entry-meta {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--ink-3); font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 4px;
+}
+.tracker-popover__entry-who { color: var(--ink); font-weight: 600; }
+.tracker-popover__entry-body { color: var(--ink); font-size: 12.5px; line-height: 1.5; }
+.tracker-popover__entry-body code {
+  font-family: var(--mono); font-size: 11.5px;
+  color: var(--ink-2); background: var(--surface-2);
+  padding: 1px 5px; border-radius: 3px;
+}
+
+.tracker-popover__compose {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px 10px 16px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.tracker-popover__compose input {
+  flex: 1; background: transparent;
+  border: 0; outline: 0;
+  color: var(--ink); font: inherit;
+  font-size: 13px;
+  padding: 6px 0;
+}
+.tracker-popover__compose input::placeholder { color: var(--ink-3); }
+.tracker-popover__hint {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--ink-3);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  padding: 1px 6px;
+  background: var(--surface);
+}
+
+.tracker-popover__foot {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 16px 10px;
+  border-top: 1px solid var(--line);
+}
+.tracker-popover__all {
+  color: var(--ink-2); font-size: 11.5px;
+  cursor: pointer;
+  background: transparent; border: 0;
+  font: inherit;
+  padding: 0;
+}
+.tracker-popover__all:hover { color: var(--accent); }
+.tracker-popover__foot-grow { flex: 1; }
+.tracker-popover__keys {
+  display: inline-flex; gap: 6px;
+  color: var(--ink-3); font-size: 10.5px;
+}
+.tracker-popover__key {
+  font-family: var(--mono); padding: 1px 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.tracker-popover--labelpicker {
+  width: 280px;
+  padding: 0;
+}
+.tracker-popover--labelpicker::before { display: none; }
+.tracker-popover__search {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.tracker-popover__search input {
+  width: 100%;
+  background: transparent;
+  border: 0; outline: 0;
+  color: var(--ink); font: inherit;
+  font-size: 13px;
+  padding: 4px 0;
+}
+.tracker-popover__search input::placeholder { color: var(--ink-3); }
+
+.tracker-popover__row {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 120ms ease;
+}
+.tracker-popover__row:hover { background: var(--surface-2); }
+.tracker-popover__row--create { color: var(--accent); font-weight: 500; }
+
+.tracker-popover__check {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px;
+  font-size: 11px;
+  color: var(--ink-2);
+  font-family: var(--mono);
+}
+.tracker-popover--labelpicker .tracker-popover__row--create .tracker-popover__check {
+  color: var(--accent);
+}
+
+.tracker-popover__sep {
+  height: 1px;
+  background: var(--line);
+  margin: 4px 0;
+}
