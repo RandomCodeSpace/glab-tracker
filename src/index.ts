@@ -1,3 +1,3 @@
 import "./styles/tracker.css";
-
-export {};
+export { Tracker } from "./Tracker";
+export type { TrackerProps } from "./types/props";
