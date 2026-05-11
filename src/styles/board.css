@@ -23,24 +23,25 @@
 .tracker-col { display: flex; flex-direction: column; min-height: 760px; }
 
 .tracker-col__head {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   height: 34px;
   padding: 0 14px;
   margin: 0 4px 16px;
-  background: var(--surface);
+  background: rgba(26, 24, 16, 0.10);
+  color: var(--ink);
   border-radius: var(--r-2);
   box-shadow:
     0 1px 1px rgba(26, 24, 16, 0.06),
-    0 4px 12px rgba(26, 24, 16, 0.08),
-    0 0 0 0.5px rgba(26, 24, 16, 0.06);
-  align-self: flex-start;
+    0 4px 12px rgba(26, 24, 16, 0.08);
 }
 .tracker-col__name {
   display: inline-flex; align-items: center; gap: 8px;
   font-size: 13px; font-weight: 600;
-  letter-spacing: -0.008em; color: var(--ink);
+  letter-spacing: -0.008em;
+  color: var(--ink);
   line-height: 1;
 }
 .tracker-col__name::before {
@@ -48,17 +49,27 @@
   width: 6px; height: 6px; border-radius: 50%;
   background: var(--ink-4);
 }
+
+.tracker-col[data-state="doing"] .tracker-col__head { background: rgba(29, 61, 168, 0.14); }
 .tracker-col[data-state="doing"] .tracker-col__name::before { background: var(--accent); }
+.tracker-col[data-state="done"] .tracker-col__head { background: rgba(28, 102, 53, 0.14); }
 .tracker-col[data-state="done"] .tracker-col__name::before { background: var(--done); }
 
 .tracker-col__count {
   font-size: 11px; font-family: var(--mono);
-  color: var(--ink-3); font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
-.tracker-col__list { display: flex; flex-direction: column; gap: 10px; }
-.tracker-col__list.is-over {
+.tracker-col__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-height: 120px;
+}
+.tracker-col.is-over .tracker-col__list {
   background: var(--accent-soft);
   border-radius: var(--r-2);
   outline: 1px dashed var(--accent-ring);

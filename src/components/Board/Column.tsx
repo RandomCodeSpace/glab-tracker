@@ -19,12 +19,12 @@ export function Column(props: ColumnProps) {
     data: { kind: "column", state: props.state },
   });
   return (
-    <div className="tracker-col" data-state={props.state}>
+    <div className={`tracker-col${isOver ? " is-over" : ""}`} data-state={props.state} ref={setNodeRef}>
       <div className="tracker-col__head">
         <span className="tracker-col__name">{props.name}</span>
         <span className="tracker-col__count">{props.issues.length}</span>
       </div>
-      <div className={`tracker-col__list${isOver ? " is-over" : ""}`} ref={setNodeRef}>
+      <div className="tracker-col__list">
         {props.issues.map((i) => (
           <Card
             key={i.iid}

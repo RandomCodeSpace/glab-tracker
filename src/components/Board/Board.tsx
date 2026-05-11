@@ -5,7 +5,7 @@ import { MobileNav } from "./MobileNav";
 
 const ORDER: ColumnState[] = ["todo", "doing", "done"];
 const NAMES: Record<ColumnState, string> = {
-  todo: "To do", doing: "Doing", done: "Done", cancelled: "Cancelled",
+  todo: "To do", doing: "In Progress", done: "Done", cancelled: "Cancelled",
 };
 
 export interface BoardProps {
