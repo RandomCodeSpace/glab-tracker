@@ -40,9 +40,13 @@ export async function createSidecarStore(dbName = "tracker-sidecar"): Promise<Si
     },
     async clearFlagReason(iid, flag) { await handle.delete("flagReasons", reasonKey(iid, flag)); },
     async getAllFlagReasons(iid) {
-      const all = (await handle.getAll("flagReasons")) as { iid: number; flag: Flag; reason: string }[];
+      const [blocked, reviewing] = await Promise.all([
+        handle.get("flagReasons", reasonKey(iid, "blocked")) as Promise<{ reason: string } | undefined>,
+        handle.get("flagReasons", reasonKey(iid, "reviewing")) as Promise<{ reason: string } | undefined>,
+      ]);
       const out: Partial<Record<Flag, string>> = {};
-      for (const r of all) if (r.iid === iid) out[r.flag] = r.reason;
+      if (blocked) out.blocked = blocked.reason;
+      if (reviewing) out.reviewing = reviewing.reason;
       return out;
     },
     async setOrder(col, ids) { await handle.put("ordering", ids, col); },
