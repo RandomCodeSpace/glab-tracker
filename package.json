@@ -1,8 +1,19 @@
 {
-  "name": "@yourscope/gitlab-tracker",
-  "version": "0.0.0",
+  "name": "@ossrandom/glab-tracker",
+  "version": "0.1.0",
   "description": "Personal GitLab issue tracker — React component, npm-distributed.",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RandomCodeSpace/glab-tracker.git"
+  },
+  "homepage": "https://github.com/RandomCodeSpace/glab-tracker#readme",
+  "bugs": {
+    "url": "https://github.com/RandomCodeSpace/glab-tracker/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
