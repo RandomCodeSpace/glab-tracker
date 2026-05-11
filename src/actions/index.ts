@@ -20,7 +20,13 @@ export interface ActionsCtx {
   notes: NotesApi;
   labels: LabelsApi;
   sidecar: SidecarStore;
-  store: TrackerState;
+  /**
+   * Live accessor for the Zustand store. We must NOT capture the snapshot at
+   * construction time — issues forked after mount would be invisible.
+   * `useTracker.getState` is a stable function reference; calling it returns
+   * the current state on every invocation.
+   */
+  store: { getState: () => TrackerState };
   personalProjectId: number;
   ownProjectFullPath: string;
   instanceUrl: string;
@@ -46,7 +52,8 @@ function nextStateFromPatch(p: IssuePatch): ColumnState | null {
 
 export function createActions(ctx: ActionsCtx) {
   async function applyPatch(iid: number, patch: IssuePatch & { title?: string; description?: string }) {
-    const before = ctx.store.issues.get(iid);
+    const s0 = ctx.store.getState();
+    const before = s0.issues.get(iid);
     if (!before) return;
 
     // Build optimistic copy
@@ -61,18 +68,20 @@ export function createActions(ctx: ActionsCtx) {
       if (l === "flag::blocked") optimistic.flags.delete("blocked");
       if (l === "flag::reviewing") optimistic.flags.delete("reviewing");
     }
-    ctx.store.upsertIssue(optimistic);
+    s0.upsertIssue(optimistic);
 
     try {
       const updated = await ctx.issues.update(ctx.personalProjectId, iid, patch);
       const reasons = await ctx.sidecar.getAllFlagReasons(iid);
+      const s1 = ctx.store.getState();
       const fresh = mapIssue({
-        raw: updated, openAssignedSet: ctx.store.openAssignedSet, flagReasons: reasons,
+        raw: updated, openAssignedSet: s1.openAssignedSet, flagReasons: reasons,
       });
-      ctx.store.upsertIssue(fresh);
+      s1.upsertIssue(fresh);
     } catch (e) {
-      ctx.store.upsertIssue(before);
-      ctx.store.pushToast({ kind: "error", message: `Update failed: ${(e as Error).message}` });
+      const s1 = ctx.store.getState();
+      s1.upsertIssue(before);
+      s1.pushToast({ kind: "error", message: `Update failed: ${(e as Error).message}` });
     }
   }
 
@@ -83,7 +92,7 @@ export function createActions(ctx: ActionsCtx) {
 
   return {
     async moveColumn(iid: number, to: ColumnState) {
-      const issue = ctx.store.issues.get(iid);
+      const issue = ctx.store.getState().issues.get(iid);
       if (!issue) return;
       const patch = planTransition(issue.state, to);
       if (!patch) return;
@@ -102,9 +111,10 @@ export function createActions(ctx: ActionsCtx) {
       try {
         const updated = await ctx.issues.update(ctx.personalProjectId, iid, { title: sanitized });
         const reasons = await ctx.sidecar.getAllFlagReasons(iid);
-        ctx.store.upsertIssue(mapIssue({ raw: updated, openAssignedSet: ctx.store.openAssignedSet, flagReasons: reasons }));
+        const s = ctx.store.getState();
+        s.upsertIssue(mapIssue({ raw: updated, openAssignedSet: s.openAssignedSet, flagReasons: reasons }));
       } catch (e) {
-        ctx.store.pushToast({ kind: "error", message: `Title update failed: ${(e as Error).message}` });
+        ctx.store.getState().pushToast({ kind: "error", message: `Title update failed: ${(e as Error).message}` });
       }
     },
 
@@ -113,9 +123,10 @@ export function createActions(ctx: ActionsCtx) {
       try {
         const updated = await ctx.issues.update(ctx.personalProjectId, iid, { description: sanitized });
         const reasons = await ctx.sidecar.getAllFlagReasons(iid);
-        ctx.store.upsertIssue(mapIssue({ raw: updated, openAssignedSet: ctx.store.openAssignedSet, flagReasons: reasons }));
+        const s = ctx.store.getState();
+        s.upsertIssue(mapIssue({ raw: updated, openAssignedSet: s.openAssignedSet, flagReasons: reasons }));
       } catch (e) {
-        ctx.store.pushToast({ kind: "error", message: `Description update failed: ${(e as Error).message}` });
+        ctx.store.getState().pushToast({ kind: "error", message: `Description update failed: ${(e as Error).message}` });
       }
     },
 
@@ -126,9 +137,10 @@ export function createActions(ctx: ActionsCtx) {
         // refresh count via a no-op update (returns the latest issue)
         const updated = await ctx.issues.update(ctx.personalProjectId, iid, {});
         const reasons = await ctx.sidecar.getAllFlagReasons(iid);
-        ctx.store.upsertIssue(mapIssue({ raw: updated, openAssignedSet: ctx.store.openAssignedSet, flagReasons: reasons }));
+        const s = ctx.store.getState();
+        s.upsertIssue(mapIssue({ raw: updated, openAssignedSet: s.openAssignedSet, flagReasons: reasons }));
       } catch (e) {
-        ctx.store.pushToast({ kind: "error", message: `Could not add note: ${(e as Error).message}` });
+        ctx.store.getState().pushToast({ kind: "error", message: `Could not add note: ${(e as Error).message}` });
       }
     },
 
@@ -141,26 +153,27 @@ export function createActions(ctx: ActionsCtx) {
           ownProjectFullPath: ctx.ownProjectFullPath,
           localIssues: localRaw,
         });
-        ctx.store.setOpenAssignedSet(result.openAssignedSet);
+        const s = ctx.store.getState();
+        s.setOpenAssignedSet(result.openAssignedSet);
         const refreshed = [...localRaw, ...result.forked];
         const mapped = await Promise.all(refreshed.map(async (raw) => {
           const reasons = await ctx.sidecar.getAllFlagReasons(raw.iid);
           return mapIssue({ raw, openAssignedSet: result.openAssignedSet, flagReasons: reasons });
         }));
-        ctx.store.setIssues(mapped);
-        ctx.store.pushToast({
+        ctx.store.getState().setIssues(mapped);
+        ctx.store.getState().pushToast({
           kind: "info",
           message: `Synced: ${result.forked.length} forked, ${result.skipped.length} already tracked.`,
         });
       } catch (e) {
-        ctx.store.pushToast({ kind: "error", message: `Sync failed: ${(e as Error).message}` });
+        ctx.store.getState().pushToast({ kind: "error", message: `Sync failed: ${(e as Error).message}` });
       }
     },
 
     async forkFromUrl(rawUrl: string) {
       const parsed = parseGitLabIssueUrl(rawUrl, ctx.instanceUrl);
       if (!parsed) {
-        ctx.store.pushToast({ kind: "error", message: "Not a recognized GitLab issue URL on this instance." });
+        ctx.store.getState().pushToast({ kind: "error", message: "Not a recognized GitLab issue URL on this instance." });
         return;
       }
       try {
@@ -173,17 +186,18 @@ export function createActions(ctx: ActionsCtx) {
           },
         });
         const reasons = await ctx.sidecar.getAllFlagReasons(created.iid);
-        ctx.store.upsertIssue(mapIssue({
-          raw: created, openAssignedSet: ctx.store.openAssignedSet, flagReasons: reasons,
+        const s = ctx.store.getState();
+        s.upsertIssue(mapIssue({
+          raw: created, openAssignedSet: s.openAssignedSet, flagReasons: reasons,
         }));
-        ctx.store.pushToast({ kind: "info", message: `Forked ${parsed.projectPath}#${parsed.issueIid}.` });
+        s.pushToast({ kind: "info", message: `Forked ${parsed.projectPath}#${parsed.issueIid}.` });
       } catch (e) {
-        ctx.store.pushToast({ kind: "error", message: `Fork failed: ${(e as Error).message}` });
+        ctx.store.getState().pushToast({ kind: "error", message: `Fork failed: ${(e as Error).message}` });
       }
     },
 
     async pullSnapshot(iid: number) {
-      const issue = ctx.store.issues.get(iid);
+      const issue = ctx.store.getState().issues.get(iid);
       if (!issue?.source) return;
       try {
         const sourceProjectPath = await getProjectPath(issue.source.projectId);
@@ -194,9 +208,9 @@ export function createActions(ctx: ActionsCtx) {
           personalProjectId: ctx.personalProjectId,
           localIssueIid: iid,
         });
-        ctx.store.pushToast({ kind: "info", message: "Source snapshot added to notes." });
+        ctx.store.getState().pushToast({ kind: "info", message: "Source snapshot added to notes." });
       } catch (e) {
-        ctx.store.pushToast({ kind: "error", message: `Pull source failed: ${(e as Error).message}` });
+        ctx.store.getState().pushToast({ kind: "error", message: `Pull source failed: ${(e as Error).message}` });
       }
     },
 
@@ -212,16 +226,17 @@ export function createActions(ctx: ActionsCtx) {
           labels: ["state::todo", "src::side"],
         });
         const reasons = await ctx.sidecar.getAllFlagReasons(created.iid);
-        ctx.store.upsertIssue(mapIssue({
-          raw: created, openAssignedSet: ctx.store.openAssignedSet, flagReasons: reasons,
+        const s = ctx.store.getState();
+        s.upsertIssue(mapIssue({
+          raw: created, openAssignedSet: s.openAssignedSet, flagReasons: reasons,
         }));
       } catch (e) {
-        ctx.store.pushToast({ kind: "error", message: `Could not create issue: ${(e as Error).message}` });
+        ctx.store.getState().pushToast({ kind: "error", message: `Could not create issue: ${(e as Error).message}` });
       }
     },
 
     async cancelIssue(iid: number) {
-      const before = ctx.store.issues.get(iid);
+      const before = ctx.store.getState().issues.get(iid);
       if (!before) return;
       const patch = planTransition(before.state, "cancelled");
       if (!patch) return;
@@ -229,7 +244,7 @@ export function createActions(ctx: ActionsCtx) {
     },
 
     async restoreFromCancel(iid: number) {
-      const before = ctx.store.issues.get(iid);
+      const before = ctx.store.getState().issues.get(iid);
       if (!before || before.state !== "cancelled") return;
       const patch = planTransition("cancelled", "todo");
       if (!patch) return;
@@ -239,19 +254,21 @@ export function createActions(ctx: ActionsCtx) {
     async deleteIssue(iid: number) {
       try {
         await ctx.issues.delete(ctx.personalProjectId, iid);
-        ctx.store.removeIssue(iid);
+        ctx.store.getState().removeIssue(iid);
       } catch (e) {
-        ctx.store.pushToast({ kind: "error", message: `Delete failed: ${(e as Error).message}` });
+        ctx.store.getState().pushToast({ kind: "error", message: `Delete failed: ${(e as Error).message}` });
       }
     },
 
     async addUserLabel(iid: number, name: string) {
-      const issue = ctx.store.issues.get(iid);
+      const s = ctx.store.getState();
+      const issue = s.issues.get(iid);
       if (!issue) return;
-      const existing = ctx.store.projectLabels.find((l) => l.name === name);
+      const existing = s.projectLabels.find((l) => l.name === name);
       if (!existing) {
         const created = await ctx.labels.create(ctx.personalProjectId, { name, color: hueColor(name) });
-        ctx.store.setProjectLabels([...ctx.store.projectLabels, created]);
+        const s1 = ctx.store.getState();
+        s1.setProjectLabels([...s1.projectLabels, created]);
       }
       await applyPatch(iid, { add_labels: [name] });
     },

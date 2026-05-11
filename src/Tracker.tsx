@@ -113,7 +113,7 @@ export function Tracker(props: TrackerProps) {
 
       const actions = createActions({
         api, issues: issuesApi, notes: notesApi, labels: labelsApi,
-        sidecar, store: useTracker.getState(),
+        sidecar, store: { getState: useTracker.getState },
         personalProjectId: props.personalProjectId,
         ownProjectFullPath: ownProjectPath,
         instanceUrl: authCfg.instanceUrl,
