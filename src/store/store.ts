@@ -28,6 +28,8 @@ export interface TrackerState {
   filter: Filter;
   /** Set of `${pid}-${iid}` for source open-assigned issues, refreshed on Sync All. */
   openAssignedSet: Set<string>;
+  /** True after the first Sync All completes; gates divergence indicators. */
+  hasSynced: boolean;
   /** Local-only ordering per column. */
   ordering: OrderingMap;
   /** Toasts queue. */
@@ -55,6 +57,7 @@ export const useTracker = create<TrackerState>((set) => ({
   selection: null,
   filter: { labelNames: new Set(), flag: null, showCancelled: false },
   openAssignedSet: new Set(),
+  hasSynced: false,
   ordering: {},
   toasts: [],
   isDragging: false,
@@ -70,7 +73,7 @@ export const useTracker = create<TrackerState>((set) => ({
   setFilter: (f) => set((s) => ({ filter: { ...s.filter, ...f } })),
   clearFilter: () =>
     set({ filter: { labelNames: new Set(), flag: null, showCancelled: false } }),
-  setOpenAssignedSet: (s) => set({ openAssignedSet: s }),
+  setOpenAssignedSet: (s) => set({ openAssignedSet: s, hasSynced: true }),
   setOrder: (col, ids) => set((s) => ({ ordering: { ...s.ordering, [col]: ids } })),
   pushToast: (t) => {
     const id = crypto.randomUUID();

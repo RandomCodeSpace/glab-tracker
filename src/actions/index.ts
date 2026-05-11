@@ -76,6 +76,7 @@ export function createActions(ctx: ActionsCtx) {
       const s1 = ctx.store.getState();
       const fresh = mapIssue({
         raw: updated, openAssignedSet: s1.openAssignedSet, flagReasons: reasons,
+        hasSynced: s1.hasSynced,
       });
       s1.upsertIssue(fresh);
     } catch (e) {
@@ -112,7 +113,7 @@ export function createActions(ctx: ActionsCtx) {
         const updated = await ctx.issues.update(ctx.personalProjectId, iid, { title: sanitized });
         const reasons = await ctx.sidecar.getAllFlagReasons(iid);
         const s = ctx.store.getState();
-        s.upsertIssue(mapIssue({ raw: updated, openAssignedSet: s.openAssignedSet, flagReasons: reasons }));
+        s.upsertIssue(mapIssue({ raw: updated, openAssignedSet: s.openAssignedSet, flagReasons: reasons, hasSynced: s.hasSynced }));
       } catch (e) {
         ctx.store.getState().pushToast({ kind: "error", message: `Title update failed: ${(e as Error).message}` });
       }
@@ -124,7 +125,7 @@ export function createActions(ctx: ActionsCtx) {
         const updated = await ctx.issues.update(ctx.personalProjectId, iid, { description: sanitized });
         const reasons = await ctx.sidecar.getAllFlagReasons(iid);
         const s = ctx.store.getState();
-        s.upsertIssue(mapIssue({ raw: updated, openAssignedSet: s.openAssignedSet, flagReasons: reasons }));
+        s.upsertIssue(mapIssue({ raw: updated, openAssignedSet: s.openAssignedSet, flagReasons: reasons, hasSynced: s.hasSynced }));
       } catch (e) {
         ctx.store.getState().pushToast({ kind: "error", message: `Description update failed: ${(e as Error).message}` });
       }
@@ -138,7 +139,7 @@ export function createActions(ctx: ActionsCtx) {
         const updated = await ctx.issues.update(ctx.personalProjectId, iid, {});
         const reasons = await ctx.sidecar.getAllFlagReasons(iid);
         const s = ctx.store.getState();
-        s.upsertIssue(mapIssue({ raw: updated, openAssignedSet: s.openAssignedSet, flagReasons: reasons }));
+        s.upsertIssue(mapIssue({ raw: updated, openAssignedSet: s.openAssignedSet, flagReasons: reasons, hasSynced: s.hasSynced }));
       } catch (e) {
         ctx.store.getState().pushToast({ kind: "error", message: `Could not add note: ${(e as Error).message}` });
       }
@@ -158,7 +159,8 @@ export function createActions(ctx: ActionsCtx) {
         const refreshed = [...localRaw, ...result.forked];
         const mapped = await Promise.all(refreshed.map(async (raw) => {
           const reasons = await ctx.sidecar.getAllFlagReasons(raw.iid);
-          return mapIssue({ raw, openAssignedSet: result.openAssignedSet, flagReasons: reasons });
+          // setOpenAssignedSet flips hasSynced=true, so subsequent mapIssue calls see it true.
+          return mapIssue({ raw, openAssignedSet: result.openAssignedSet, flagReasons: reasons, hasSynced: true });
         }));
         ctx.store.getState().setIssues(mapped);
         ctx.store.getState().pushToast({
@@ -189,6 +191,7 @@ export function createActions(ctx: ActionsCtx) {
         const s = ctx.store.getState();
         s.upsertIssue(mapIssue({
           raw: created, openAssignedSet: s.openAssignedSet, flagReasons: reasons,
+          hasSynced: s.hasSynced,
         }));
         s.pushToast({ kind: "info", message: `Forked ${parsed.projectPath}#${parsed.issueIid}.` });
       } catch (e) {
@@ -229,6 +232,7 @@ export function createActions(ctx: ActionsCtx) {
         const s = ctx.store.getState();
         s.upsertIssue(mapIssue({
           raw: created, openAssignedSet: s.openAssignedSet, flagReasons: reasons,
+          hasSynced: s.hasSynced,
         }));
       } catch (e) {
         ctx.store.getState().pushToast({ kind: "error", message: `Could not create issue: ${(e as Error).message}` });

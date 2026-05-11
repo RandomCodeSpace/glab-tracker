@@ -15,7 +15,10 @@ const raw: GitLabIssue = {
 
 describe("mapIssue", () => {
   it("derives state, origin, flags, source, userLabels", () => {
-    const m = mapIssue({ raw, openAssignedSet: new Set(["42-421"]), flagReasons: { blocked: "x" } });
+    const m = mapIssue({
+      raw, openAssignedSet: new Set(["42-421"]), flagReasons: { blocked: "x" },
+      hasSynced: true,
+    });
     expect(m.state).toBe("doing");
     expect(m.origin).toBe("bau");
     expect(m.flags.has("blocked")).toBe(true);
@@ -23,5 +26,24 @@ describe("mapIssue", () => {
     expect(m.userLabels.map((l) => l.name)).toEqual(["area::auth"]);
     expect(m.flagReasons.blocked).toBe("x");
     expect(m.divergence).toBeNull();
+  });
+
+  it("forces divergence to null before first sync (hasSynced=false), even for bau non-done with empty open-assigned set", () => {
+    // Pre-sync: openAssignedSet is empty, but we must not flag every bau
+    // non-done issue as "source-closed" — that's a false signal until Sync All
+    // populates the open-assigned set.
+    const m = mapIssue({
+      raw, openAssignedSet: new Set(), flagReasons: {}, hasSynced: false,
+    });
+    expect(m.divergence).toBeNull();
+  });
+
+  it("uses computed divergence after first sync (hasSynced=true)", () => {
+    // After a sync with empty open-assigned set, a bau non-done issue
+    // SHOULD be flagged as source-closed.
+    const m = mapIssue({
+      raw, openAssignedSet: new Set(), flagReasons: {}, hasSynced: true,
+    });
+    expect(m.divergence).toBe("source-closed");
   });
 });

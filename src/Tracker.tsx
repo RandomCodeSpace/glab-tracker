@@ -103,9 +103,13 @@ export function Tracker(props: TrackerProps) {
       store.setProjectLabels(labels);
 
       const localRaw = await issuesApi.listInProject(props.personalProjectId);
+      const initial = useTracker.getState();
       const mapped = await Promise.all(localRaw.map(async (r) => {
         const reasons = await sidecar.getAllFlagReasons(r.iid);
-        return mapIssue({ raw: r, openAssignedSet: store.openAssignedSet, flagReasons: reasons });
+        return mapIssue({
+          raw: r, openAssignedSet: initial.openAssignedSet, flagReasons: reasons,
+          hasSynced: initial.hasSynced,
+        });
       }));
       store.setIssues(mapped);
 
