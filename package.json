@@ -1,7 +1,7 @@
 {
-  "name": "@ossrandom/glab-tracker",
-  "version": "0.1.4",
-  "description": "Personal GitLab issue tracker — React component, npm-distributed.",
+  "name": "@ossrandom/lane",
+  "version": "0.1.5",
+  "description": "Lane — a personal kanban tracker that mounts on top of your GitLab account, distributed as a React component.",
   "type": "module",
   "repository": {
     "type": "git",

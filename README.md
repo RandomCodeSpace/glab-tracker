@@ -1,6 +1,6 @@
 # Lane
 
-> Distributed on npm as [`@ossrandom/glab-tracker`](https://www.npmjs.com/package/@ossrandom/glab-tracker).
+> Distributed on npm as [`@ossrandom/lane`](https://www.npmjs.com/package/@ossrandom/lane).
 
 A React component that mounts a personal kanban-style tracker on top of your own GitLab account, so you can plan, flag, and reorder issues from across an entire instance without ever writing back to the projects they live in. The component reads from any GitLab project you have access to and writes only to a single private "personal tracker" project that you own — every other project is strictly read-only.
 
@@ -11,22 +11,22 @@ MIT licensed. Requires React 18+ or 19+. `react` and `react-dom` are peer depend
 ## Install
 
 ```bash
-npm install @ossrandom/glab-tracker
+npm install @ossrandom/lane
 ```
 
 The component ships pre-compiled CSS in a separate file. Import it once, anywhere in your app's bundle:
 
 ```ts
-import "@ossrandom/glab-tracker/style.css";
+import "@ossrandom/lane/style.css";
 ```
 
-The default JS entry also pulls the stylesheet as a side-effect import, so most bundlers will pick it up automatically if you `import { Tracker } from "@ossrandom/glab-tracker"`. Importing `style.css` explicitly is the safe option when your bundler is configured to drop side-effect imports.
+The default JS entry also pulls the stylesheet as a side-effect import, so most bundlers will pick it up automatically if you `import { Tracker } from "@ossrandom/lane"`. Importing `style.css` explicitly is the safe option when your bundler is configured to drop side-effect imports.
 
 ## Quickstart
 
 ```tsx
-import { Tracker } from "@ossrandom/glab-tracker";
-import "@ossrandom/glab-tracker/style.css";
+import { Tracker } from "@ossrandom/lane";
+import "@ossrandom/lane/style.css";
 
 export default function App() {
   return (
