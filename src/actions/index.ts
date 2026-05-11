@@ -135,11 +135,10 @@ export function createActions(ctx: ActionsCtx) {
       const sanitized = sanitizeForGitLab(body, { ownProject: ctx.ownProjectFullPath });
       try {
         await ctx.notes.create(ctx.personalProjectId, iid, sanitized);
-        // refresh count via a no-op update (returns the latest issue)
-        const updated = await ctx.issues.update(ctx.personalProjectId, iid, {});
-        const reasons = await ctx.sidecar.getAllFlagReasons(iid);
-        const s = ctx.store.getState();
-        s.upsertIssue(mapIssue({ raw: updated, openAssignedSet: s.openAssignedSet, flagReasons: reasons, hasSynced: s.hasSynced }));
+        const current = ctx.store.getState().issues.get(iid);
+        if (current) {
+          ctx.store.getState().upsertIssue({ ...current, noteCount: current.noteCount + 1 });
+        }
       } catch (e) {
         ctx.store.getState().pushToast({ kind: "error", message: `Could not add note: ${(e as Error).message}` });
       }
