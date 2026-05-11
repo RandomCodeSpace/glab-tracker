@@ -279,6 +279,7 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
       </DndOrchestrator>
       {selected && (
         <Drawer
+          key={selected.iid}
           issue={selected}
           sourceUrl={sourceUrlFor(selected)}
           notes={notes}
