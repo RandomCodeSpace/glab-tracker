@@ -7,7 +7,9 @@ export interface ConnectScreenProps {
   step: ConnectStep;
   username: string | null;
   instanceHost: string;
+  oauthEnabled: boolean;
   onAuthorize: () => void;
+  onSubmitToken: (token: string) => Promise<{ ok: boolean; error?: string }>;
   onSubmitProjectId: (id: number) => Promise<{ ok: boolean; error?: string }>;
   bootstrapResult: { created: string[]; alreadyPresent: string[] } | null;
 }
@@ -17,6 +19,11 @@ export function ConnectScreen(p: ConnectScreenProps) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
+  const [showTokenForm, setShowTokenForm] = useState(false);
+  const [token, setToken] = useState("");
+  const [tokenError, setTokenError] = useState<string | null>(null);
+  const [tokenBusy, setTokenBusy] = useState(false);
+
   async function submit() {
     const pid = Number.parseInt(pidStr, 10);
     if (!Number.isInteger(pid) || pid <= 0) { setError("Enter a numeric project ID"); return; }
@@ -25,6 +32,15 @@ export function ConnectScreen(p: ConnectScreenProps) {
     const r = await p.onSubmitProjectId(pid);
     setBusy(false);
     if (!r.ok) setError(r.error ?? "Could not connect");
+  }
+
+  async function submitToken() {
+    if (!token.trim()) { setTokenError("Paste a token"); return; }
+    setTokenBusy(true);
+    setTokenError(null);
+    const r = await p.onSubmitToken(token);
+    setTokenBusy(false);
+    if (!r.ok) setTokenError(r.error ?? "Could not connect");
   }
 
   return (
@@ -40,14 +56,46 @@ export function ConnectScreen(p: ConnectScreenProps) {
         <li className={`tracker-connect__step${p.step === "authorize" ? " is-current" : ""}${p.username ? " is-done" : ""}`}>
           <span className="tracker-connect__num">01</span>
           <div>
-            <div className="tracker-connect__step-title">Authorize on {p.instanceHost}</div>
+            <div className="tracker-connect__step-title">
+              {p.oauthEnabled ? `Authorize on ${p.instanceHost}` : `Connect to ${p.instanceHost}`}
+            </div>
             <div className="tracker-connect__step-desc">
-              OAuth 2.0 Authorization Code with PKCE. Tokens live in IndexedDB on this device only.
+              {p.oauthEnabled
+                ? "OAuth 2.0 with PKCE, or use a personal/project access token. Tokens live in IndexedDB on this device only."
+                : "Paste a personal or project access token with the api scope. Stored in IndexedDB on this device only."}
             </div>
             {p.username ? (
               <div className="tracker-connect__ok">✓ Connected as @{p.username}</div>
+            ) : (showTokenForm || !p.oauthEnabled) ? (
+              <div className="tracker-connect__token">
+                <input
+                  type="password"
+                  autoFocus
+                  placeholder="glpat-… or project access token"
+                  value={token}
+                  onChange={(e) => setToken(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && submitToken()}
+                />
+                <div className="tracker-connect__token-row">
+                  <button type="button" className="tracker-btn tracker-btn--primary" disabled={tokenBusy} onClick={submitToken}>
+                    {tokenBusy ? "Verifying…" : "Connect with token"}
+                  </button>
+                  {p.oauthEnabled && (
+                    <button type="button" className="tracker-btn tracker-btn--ghost tracker-btn--small" onClick={() => { setShowTokenForm(false); setToken(""); setTokenError(null); }}>
+                      Use OAuth instead
+                    </button>
+                  )}
+                </div>
+                <div className="tracker-connect__token-hint">
+                  Needs the <code>api</code> scope. Settings → Access Tokens on {p.instanceHost}.
+                </div>
+                {tokenError && <div className="tracker-connect__error">{tokenError}</div>}
+              </div>
             ) : (
-              <button type="button" className="tracker-btn tracker-btn--primary" onClick={p.onAuthorize}>Authorize</button>
+              <div className="tracker-connect__choice">
+                <button type="button" className="tracker-btn tracker-btn--primary" onClick={p.onAuthorize}>Authorize with OAuth</button>
+                <button type="button" className="tracker-btn tracker-btn--ghost" onClick={() => setShowTokenForm(true)}>Use a token instead</button>
+              </div>
             )}
           </div>
         </li>

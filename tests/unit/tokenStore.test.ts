@@ -6,19 +6,28 @@ describe("tokenStore", () => {
     indexedDB.deleteDatabase("tracker-test");
   });
 
-  it("persists and retrieves tokens", async () => {
+  it("persists and retrieves oauth tokens", async () => {
     const store = await createTokenStore("tracker-test");
-    const tokens = {
-      access_token: "a", refresh_token: "r", token_type: "Bearer" as const,
-      expires_in: 7200, obtained_at: Date.now(), scope: "api",
+    const auth = {
+      kind: "oauth" as const,
+      tokens: {
+        access_token: "a", refresh_token: "r", token_type: "Bearer" as const,
+        expires_in: 7200, obtained_at: Date.now(), scope: "api",
+      },
     };
-    await store.set(tokens);
-    expect(await store.get()).toEqual(tokens);
+    await store.set(auth);
+    expect(await store.get()).toEqual(auth);
   });
 
-  it("clear removes tokens", async () => {
+  it("persists and retrieves a PAT", async () => {
     const store = await createTokenStore("tracker-test");
-    await store.set({ access_token: "a", refresh_token: "r", token_type: "Bearer", expires_in: 1, obtained_at: 1, scope: "api" });
+    await store.set({ kind: "pat", token: "glpat-xxxxxxx" });
+    expect(await store.get()).toEqual({ kind: "pat", token: "glpat-xxxxxxx" });
+  });
+
+  it("clear removes the stored auth", async () => {
+    const store = await createTokenStore("tracker-test");
+    await store.set({ kind: "pat", token: "glpat-x" });
     await store.clear();
     expect(await store.get()).toBeNull();
   });

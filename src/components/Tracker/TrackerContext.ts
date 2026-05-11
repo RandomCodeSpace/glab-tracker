@@ -13,6 +13,7 @@ export interface TrackerCtx {
   instanceUrl: string;
   personalProjectId: number;
   username: string;
+  signOut: () => Promise<void>;
 }
 
 export const TrackerContextC = createContext<TrackerCtx | null>(null);

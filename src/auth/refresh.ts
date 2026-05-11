@@ -4,11 +4,8 @@ import type { AuthConfig } from "./oauth";
 import { refreshTokens } from "./oauth";
 
 export interface AuthSession {
-  /** Returns a valid access token, refreshing if needed. */
   accessToken(): Promise<string>;
-  /** Force-refresh on 401 from a request. Concurrent calls are coalesced. */
   forceRefresh(): Promise<string>;
-  /** Clear the session (logout). */
   clear(): Promise<void>;
 }
 
@@ -20,8 +17,9 @@ export function createAuthSession(cfg: AuthConfig, store: TokenStore): AuthSessi
     inflight = (async () => {
       const current = await store.get();
       if (!current) throw new Error("no_tokens");
-      const next = await refreshTokens(cfg, current.refresh_token);
-      await store.set(next);
+      if (current.kind !== "oauth") throw new Error("token_not_refreshable");
+      const next = await refreshTokens(cfg, current.tokens.refresh_token);
+      await store.set({ kind: "oauth", tokens: next });
       return next;
     })().finally(() => { inflight = null; });
     return inflight;
@@ -29,8 +27,10 @@ export function createAuthSession(cfg: AuthConfig, store: TokenStore): AuthSessi
 
   return {
     async accessToken() {
-      const t = await store.get();
-      if (!t) throw new Error("no_tokens");
+      const a = await store.get();
+      if (!a) throw new Error("no_tokens");
+      if (a.kind === "pat") return a.token;
+      const t = a.tokens;
       const expiresAt = t.obtained_at + (t.expires_in - 60) * 1000;
       if (Date.now() >= expiresAt) {
         const fresh = await refresh();
@@ -39,6 +39,8 @@ export function createAuthSession(cfg: AuthConfig, store: TokenStore): AuthSessi
       return t.access_token;
     },
     async forceRefresh() {
+      const a = await store.get();
+      if (a?.kind === "pat") throw new Error("token_not_refreshable");
       const fresh = await refresh();
       return fresh.access_token;
     },

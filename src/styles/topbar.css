@@ -31,8 +31,16 @@
 .tracker-topbar__name {
   font-weight: 600; letter-spacing: -0.01em; font-size: 13.5px; color: var(--ink);
 }
-.tracker-topbar__instance {
-  font-family: var(--mono); font-size: 11px; color: var(--ink-3); margin-left: 2px;
+.tracker-topbar__version {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--ink-3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  margin-left: 4px;
+  letter-spacing: 0.01em;
 }
 
 .tracker-paste {

@@ -55,7 +55,7 @@ The component authenticates against GitLab using the OAuth 2.0 authorization cod
 2. Click **New application**.
 3. **Name** — anything memorable, e.g. `Personal Tracker`.
 4. **Redirect URI** — the URL where the host page renders `<Tracker>`. This must match `oauthRedirectUri` exactly, including trailing slash.
-5. **Scopes** — tick `api` and `read_user`. The `api` scope is required to create issues, notes, and labels in your personal project; `read_user` is used to display your current identity in the topbar.
+5. **Scopes** — tick `api` only. `api` already grants the read-user permission needed to display your identity in the topbar, plus the read+write access needed to create issues, notes, and labels in your personal project.
 6. **Confidential** — leave **unchecked**. The component runs in the browser and cannot hold a client secret; it is a public client and uses PKCE instead.
 7. Save. Copy the **Application ID** that GitLab shows — that's your `oauthClientId`.
 

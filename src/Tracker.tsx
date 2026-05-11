@@ -39,13 +39,16 @@ interface Services {
 export function Tracker(props: TrackerProps) {
   const [stage, setStage] = useState<Stage>({ kind: "loading" });
   const [username, setUsername] = useState<string | null>(null);
+  const [reloadId, setReloadId] = useState(0);
   const servicesRef = useRef<Services | null>(null);
   const store = useTracker();
 
+  const oauthEnabled = Boolean(props.oauthClientId && props.oauthRedirectUri);
+
   const authCfg: AuthConfig = useMemo(() => ({
     instanceUrl: props.instanceUrl,
-    clientId: props.oauthClientId,
-    redirectUri: props.oauthRedirectUri,
+    clientId: props.oauthClientId ?? "",
+    redirectUri: props.oauthRedirectUri ?? "",
   }), [props.instanceUrl, props.oauthClientId, props.oauthRedirectUri]);
 
   useEffect(() => {
@@ -55,10 +58,10 @@ export function Tracker(props: TrackerProps) {
       const sidecar = await createSidecarStore();
 
       const params = new URLSearchParams(window.location.search);
-      if (params.get("code") && params.get("state")) {
+      if (oauthEnabled && params.get("code") && params.get("state")) {
         const r = await completeAuthorize(authCfg);
         if (r.ok && r.tokens) {
-          await tokenStore.set(r.tokens);
+          await tokenStore.set({ kind: "oauth", tokens: r.tokens });
           window.history.replaceState({}, "", window.location.pathname);
         }
       }
@@ -125,12 +128,20 @@ export function Tracker(props: TrackerProps) {
         instanceUrl: authCfg.instanceUrl,
       });
 
+      const signOut = async () => {
+        await tokenStore.clear();
+        setUsername(null);
+        setStage({ kind: "loading" });
+        setReloadId((n) => n + 1);
+      };
+
       const ctx: TrackerCtx = {
         actions, api, tokenStore, sidecar,
         ownProjectPath,
         instanceUrl: authCfg.instanceUrl,
         personalProjectId: props.personalProjectId,
         username: me.username,
+        signOut,
       };
 
       if (!cancelled) {
@@ -148,7 +159,7 @@ export function Tracker(props: TrackerProps) {
     });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authCfg, props.personalProjectId]);
+  }, [authCfg, props.personalProjectId, reloadId]);
 
   if (stage.kind === "loading") {
     return (
@@ -168,7 +179,26 @@ export function Tracker(props: TrackerProps) {
           step={stage.step}
           username={username}
           instanceHost={new URL(props.instanceUrl).host}
+          oauthEnabled={oauthEnabled}
           onAuthorize={() => beginAuthorize(authCfg)}
+          onSubmitToken={async (token) => {
+            const trimmed = token.trim();
+            if (!trimmed) return { ok: false, error: "Token is empty" };
+            try {
+              const r = await fetch(`${authCfg.instanceUrl.replace(/\/+$/, "")}/api/v4/user`, {
+                headers: { Authorization: `Bearer ${trimmed}` },
+              });
+              if (r.status === 401) return { ok: false, error: "Token rejected by GitLab" };
+              if (!r.ok) return { ok: false, error: `GitLab returned ${r.status}` };
+              const ts = await createTokenStore();
+              await ts.set({ kind: "pat", token: trimmed });
+              setStage({ kind: "loading" });
+              setReloadId((n) => n + 1);
+              return { ok: true };
+            } catch (e) {
+              return { ok: false, error: (e as Error).message };
+            }
+          }}
           onSubmitProjectId={async () => ({ ok: true })}
           bootstrapResult={stage.bootstrap}
         />
@@ -198,18 +228,20 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
 
   const [composerOpen, setComposerOpen] = useState(false);
   const [labelPicker, setLabelPicker] = useState<{ rect: DOMRect; iid: number } | null>(null);
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
 
   useEffect(() => {
-    if (!composerOpen && !labelPicker) return;
+    if (!composerOpen && !labelPicker && !confirmSignOut) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setComposerOpen(false);
         setLabelPicker(null);
+        setConfirmSignOut(false);
       }
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [composerOpen, labelPicker]);
+  }, [composerOpen, labelPicker, confirmSignOut]);
 
   const filtered = useMemo(() => issuesArr.filter((i) => {
     if (i.state === "cancelled" && !filter.showCancelled) return false;
@@ -262,10 +294,12 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
       <Topbar
         projectName="Lane"
         instanceHost={new URL(ctx.instanceUrl).host}
+        username={ctx.username}
         counters={counters}
         onPasteUrl={(u) => { void ctx.actions.forkFromUrl(u); }}
         onSyncAll={() => { void ctx.actions.syncAll(); }}
         onNewIssue={() => setComposerOpen(true)}
+        onSignOut={() => setConfirmSignOut(true)}
       />
       <FilterRail
         allLabels={projectLabels}
@@ -353,6 +387,35 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
           }}
           onClose={() => setLabelPicker(null)}
         />
+      )}
+      {confirmSignOut && (
+        <div
+          className="tracker-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="tracker-confirm-title"
+          onMouseDown={(e) => { if (e.target === e.currentTarget) setConfirmSignOut(false); }}
+        >
+          <div className="tracker-confirm">
+            <h2 id="tracker-confirm-title" className="tracker-confirm__title">Sign out?</h2>
+            <p className="tracker-confirm__body">
+              You'll be signed out as @{ctx.username} and your local token will be cleared. You can sign back in any time.
+            </p>
+            <div className="tracker-confirm__actions">
+              <button
+                type="button"
+                className="tracker-btn tracker-btn--ghost"
+                onClick={() => setConfirmSignOut(false)}
+              >Cancel</button>
+              <button
+                type="button"
+                className="tracker-btn tracker-btn--primary"
+                autoFocus
+                onClick={() => { setConfirmSignOut(false); void ctx.signOut(); }}
+              >Sign out</button>
+            </div>
+          </div>
+        </div>
       )}
       <ToastTray />
     </div>

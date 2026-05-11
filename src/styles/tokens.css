@@ -72,6 +72,17 @@
   --hue-slate-on:   #e8e1ce;
 }
 
+:where(html, body) {
+  height: 100%;
+  margin: 0;
+  background: #d8d0bd;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+:where(body) { -webkit-tap-highlight-color: transparent; }
+:where(#root) { height: 100%; }
+
 .tracker, .tracker * { box-sizing: border-box; }
 .tracker {
   background: var(--canvas);

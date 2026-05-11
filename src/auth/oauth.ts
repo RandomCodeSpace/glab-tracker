@@ -22,7 +22,7 @@ export async function beginAuthorize(cfg: AuthConfig): Promise<void> {
   url.searchParams.set("client_id", cfg.clientId);
   url.searchParams.set("redirect_uri", cfg.redirectUri);
   url.searchParams.set("response_type", "code");
-  url.searchParams.set("scope", cfg.scope ?? "api read_user");
+  url.searchParams.set("scope", cfg.scope ?? "api");
   url.searchParams.set("state", state);
   url.searchParams.set("code_challenge", challenge);
   url.searchParams.set("code_challenge_method", "S256");

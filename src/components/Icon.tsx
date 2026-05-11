@@ -9,7 +9,8 @@ export type IconName =
   | "settings"
   | "plus"
   | "message"
-  | "search";
+  | "search"
+  | "logout";
 
 const PATHS: Record<IconName, string> = {
   close:
@@ -30,6 +31,8 @@ const PATHS: Record<IconName, string> = {
     "M21 12a8 8 0 0 1-8 8H8l-4 3v-5.4A8 8 0 0 1 4 12a8 8 0 0 1 8-8 8 8 0 0 1 9 8z",
   search:
     "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.3-4.3",
+  logout:
+    "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",
 };
 
 export interface IconProps extends Omit<SVGProps<SVGSVGElement>, "name"> {
