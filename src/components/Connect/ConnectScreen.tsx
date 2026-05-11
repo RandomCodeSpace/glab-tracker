@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Logo } from "../Logo";
 
 export type ConnectStep = "authorize" | "project-id" | "bootstrap" | "done";
 
@@ -28,8 +29,10 @@ export function ConnectScreen(p: ConnectScreenProps) {
 
   return (
     <section className="tracker-connect">
-      <div className="tracker-connect__mark" aria-hidden />
-      <h1 className="tracker-connect__title">Connect to your tracker.</h1>
+      <div className="tracker-connect__mark" aria-hidden>
+        <Logo size={26} />
+      </div>
+      <h1 className="tracker-connect__title">Connect to Lane.</h1>
       <p className="tracker-connect__lede">
         A private GitLab project becomes your second brain. Three steps and you're in.
       </p>
@@ -44,7 +47,7 @@ export function ConnectScreen(p: ConnectScreenProps) {
             {p.username ? (
               <div className="tracker-connect__ok">✓ Connected as @{p.username}</div>
             ) : (
-              <button type="button" className="tracker-connect__go" onClick={p.onAuthorize}>Authorize</button>
+              <button type="button" className="tracker-btn tracker-btn--primary" onClick={p.onAuthorize}>Authorize</button>
             )}
           </div>
         </li>
@@ -63,7 +66,7 @@ export function ConnectScreen(p: ConnectScreenProps) {
                   onChange={(e) => setPidStr(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && submit()}
                 />
-                <button type="button" className="tracker-connect__go" disabled={busy} onClick={submit}>
+                <button type="button" className="tracker-btn tracker-btn--primary" disabled={busy} onClick={submit}>
                   {busy ? "Connecting…" : "Connect"}
                 </button>
               </div>

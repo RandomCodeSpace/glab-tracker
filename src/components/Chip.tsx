@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import type { Hue } from "../types/tracker";
 
 export interface ChipProps {
@@ -33,10 +34,12 @@ export function Chip({ name, hue, selected, onClick }: ChipProps) {
   );
 }
 
-export function AddChip({ label, onClick }: { label: string; onClick?: () => void }) {
-  return (
-    <span className="tracker-chip is-add" onClick={onClick} role="button">
-      {label}
-    </span>
-  );
-}
+export const AddChip = forwardRef<HTMLButtonElement, { label: string; onClick?: () => void }>(
+  function AddChip({ label, onClick }, ref) {
+    return (
+      <button ref={ref} type="button" className="tracker-chip is-add" onClick={onClick}>
+        {label}
+      </button>
+    );
+  },
+);

@@ -216,16 +216,17 @@ export function createActions(ctx: ActionsCtx) {
       }
     },
 
-    async createSideIssue(input: { title: string; description: string }) {
+    async createSideIssue(input: { title: string; description: string; labels?: string[] }) {
       const sanitized = {
         title: sanitizeForGitLab(input.title, { ownProject: ctx.ownProjectFullPath }),
         description: sanitizeForGitLab(input.description, { ownProject: ctx.ownProjectFullPath }),
       };
+      const userLabels = (input.labels ?? []).filter((l) => l.trim().length > 0);
       try {
         const created = await ctx.issues.create(ctx.personalProjectId, {
           title: sanitized.title,
           description: sanitized.description,
-          labels: ["state::todo", "src::side"],
+          labels: ["state::todo", "src::side", ...userLabels],
         });
         const reasons = await ctx.sidecar.getAllFlagReasons(created.iid);
         const s = ctx.store.getState();
@@ -278,6 +279,20 @@ export function createActions(ctx: ActionsCtx) {
 
     async removeUserLabel(iid: number, name: string) {
       await applyPatch(iid, { remove_labels: [name] });
+    },
+
+    async createUserLabel(name: string) {
+      const trimmed = name.trim();
+      if (!trimmed) return;
+      const s = ctx.store.getState();
+      if (s.projectLabels.some((l) => l.name === trimmed)) return;
+      try {
+        const created = await ctx.labels.create(ctx.personalProjectId, { name: trimmed, color: hueColor(trimmed) });
+        const s1 = ctx.store.getState();
+        s1.setProjectLabels([...s1.projectLabels, created]);
+      } catch (e) {
+        ctx.store.getState().pushToast({ kind: "error", message: `Could not create label: ${(e as Error).message}` });
+      }
     },
   };
 }

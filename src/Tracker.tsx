@@ -22,6 +22,8 @@ import { createActions } from "./actions";
 import { mapIssue } from "./data/mapper";
 import { TrackerContextC, useTrackerCtx, type TrackerCtx } from "./components/Tracker/TrackerContext";
 import { ToastTray } from "./components/Toast/Toast";
+import { NewIssueComposer } from "./components/Composer/NewIssueComposer";
+import { LabelPicker } from "./components/Popovers/LabelPicker";
 
 type Stage =
   | { kind: "loading" }
@@ -151,7 +153,10 @@ export function Tracker(props: TrackerProps) {
   if (stage.kind === "loading") {
     return (
       <div className={`tracker ${props.className ?? ""}`}>
-        <div className="tracker-connect"><p className="tracker-connect__lede">Loading…</p></div>
+        <div className="tracker-loading" role="status" aria-live="polite">
+          <span className="tracker-spinner" aria-hidden />
+          <span className="tracker-loading__text">Loading</span>
+        </div>
         <ToastTray />
       </div>
     );
@@ -191,6 +196,21 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
 
   const issuesArr = useMemo(() => Array.from(issues.values()), [issues]);
 
+  const [composerOpen, setComposerOpen] = useState(false);
+  const [labelPicker, setLabelPicker] = useState<{ rect: DOMRect; iid: number } | null>(null);
+
+  useEffect(() => {
+    if (!composerOpen && !labelPicker) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setComposerOpen(false);
+        setLabelPicker(null);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [composerOpen, labelPicker]);
+
   const filtered = useMemo(() => issuesArr.filter((i) => {
     if (i.state === "cancelled" && !filter.showCancelled) return false;
     if (filter.flag && !i.flags.has(filter.flag)) return false;
@@ -209,7 +229,7 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
     },
   };
 
-  const sourceUrlFor = (_issue: { source: { projectId: number; issueIid: number } | null }) => null;
+  const webUrlFor = (issue: { webUrl: string }) => issue.webUrl;
 
   const selected = selection ? issues.get(selection.iid) ?? null : null;
   const [notes, setNotes] = useState<{ author: string; createdAt: string; body: string; system: boolean }[]>([]);
@@ -240,13 +260,12 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
   return (
     <div className={`tracker ${className ?? ""}`}>
       <Topbar
-        projectName="my-tracker"
+        projectName="Lane"
         instanceHost={new URL(ctx.instanceUrl).host}
         counters={counters}
         onPasteUrl={(u) => { void ctx.actions.forkFromUrl(u); }}
         onSyncAll={() => { void ctx.actions.syncAll(); }}
-        onNewIssue={() => { /* composer modal: paste-URL is primary in v1 */ }}
-        onOpenSettings={() => { /* settings: v2 */ }}
+        onNewIssue={() => setComposerOpen(true)}
       />
       <FilterRail
         allLabels={projectLabels}
@@ -257,43 +276,82 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
           setFilter({ labelNames: next });
         }}
         onClear={clearFilter}
-        onCreate={() => { /* label creation via drawer Add label */ }}
+        onCreate={(name) => ctx.actions.createUserLabel(name)}
       />
-      <DndOrchestrator
-        callbacks={{
-          onColumnDrop: (iid, to) => { void ctx.actions.moveColumn(iid, to); },
-          onCounterDrop: (iid, target) => {
-            if (target === "cancelled") { void ctx.actions.cancelIssue(iid); }
-            else { void ctx.actions.toggleFlag(iid, target, true); }
-          },
-        }}
-      >
-        <Board
-          issues={filtered}
-          selectedIid={selection?.iid ?? null}
-          sourceUrlFor={sourceUrlFor}
-          onSelectIssue={(iid) => select({ iid })}
-          onClearFlag={(iid, flag) => { void ctx.actions.toggleFlag(iid, flag, false); }}
-          onOpenNotes={(iid) => select({ iid })}
-        />
-      </DndOrchestrator>
-      {selected && (
-        <Drawer
-          key={selected.iid}
-          issue={selected}
-          sourceUrl={sourceUrlFor(selected)}
-          notes={notes}
-          onClose={() => select(null)}
-          onChangeState={(s) => { void ctx.actions.moveColumn(selected.iid, s); }}
-          onToggleFlag={(f, on) => { void ctx.actions.toggleFlag(selected.iid, f, on); }}
-          onEditTitle={(t) => { void ctx.actions.editTitle(selected.iid, t); }}
-          onEditDescription={(d) => { void ctx.actions.editDescription(selected.iid, d); }}
-          onAddNote={(b) => { void ctx.actions.addNote(selected.iid, b); }}
-          onPullSnapshot={() => { void ctx.actions.pullSnapshot(selected.iid); }}
-          onCancelIssue={() => { void ctx.actions.cancelIssue(selected.iid); }}
-          onDeleteIssue={() => { void ctx.actions.deleteIssue(selected.iid); }}
-          onAddLabel={() => { /* label picker: v2 */ }}
-          onRemoveLabel={(name) => { void ctx.actions.removeUserLabel(selected.iid, name); }}
+      <div className={`tracker-stage${selected ? " has-drawer" : ""}`}>
+        <DndOrchestrator
+          callbacks={{
+            onColumnDrop: (iid, to) => { void ctx.actions.moveColumn(iid, to); },
+            onCounterDrop: (iid, target) => {
+              if (target === "cancelled") { void ctx.actions.cancelIssue(iid); }
+              else { void ctx.actions.toggleFlag(iid, target, true); }
+            },
+          }}
+        >
+          <Board
+            issues={filtered}
+            selectedIid={selection?.iid ?? null}
+            webUrlFor={webUrlFor}
+            onSelectIssue={(iid) => select({ iid })}
+            onClearFlag={(iid, flag) => { void ctx.actions.toggleFlag(iid, flag, false); }}
+            onOpenNotes={(iid) => select({ iid })}
+          />
+        </DndOrchestrator>
+        {selected && (
+          <Drawer
+            key={selected.iid}
+            issue={selected}
+            webUrl={webUrlFor(selected)}
+            hasSource={selected.source !== null}
+            notes={notes}
+            onClose={() => select(null)}
+            onChangeState={(s) => { void ctx.actions.moveColumn(selected.iid, s); }}
+            onToggleFlag={(f, on) => { void ctx.actions.toggleFlag(selected.iid, f, on); }}
+            onEditTitle={(t) => { void ctx.actions.editTitle(selected.iid, t); }}
+            onEditDescription={(d) => { void ctx.actions.editDescription(selected.iid, d); }}
+            onAddNote={(b) => { void ctx.actions.addNote(selected.iid, b); }}
+            onPullSnapshot={() => { void ctx.actions.pullSnapshot(selected.iid); }}
+            onCancelIssue={() => { void ctx.actions.cancelIssue(selected.iid); }}
+            onDeleteIssue={() => { void ctx.actions.deleteIssue(selected.iid); }}
+            onAddLabel={(rect) => setLabelPicker({ rect, iid: selected.iid })}
+          />
+        )}
+      </div>
+      {composerOpen && (
+        <div
+          className="tracker-modal"
+          role="dialog"
+          aria-modal="true"
+          onMouseDown={(e) => { if (e.target === e.currentTarget) setComposerOpen(false); }}
+        >
+          <NewIssueComposer
+            allLabels={projectLabels}
+            onCreate={async (input) => {
+              await ctx.actions.createSideIssue(input);
+              setComposerOpen(false);
+            }}
+            onCreateLabel={(name) => ctx.actions.createUserLabel(name)}
+            onCancel={() => setComposerOpen(false)}
+          />
+        </div>
+      )}
+      {labelPicker && selected && (
+        <LabelPicker
+          allLabels={projectLabels}
+          current={new Set(selected.userLabels.map((l) => l.name))}
+          anchorRect={labelPicker.rect}
+          onToggle={async (name) => {
+            if (selected.userLabels.some((l) => l.name === name)) {
+              await ctx.actions.removeUserLabel(labelPicker.iid, name);
+            } else {
+              await ctx.actions.addUserLabel(labelPicker.iid, name);
+            }
+          }}
+          onCreate={async (name) => {
+            await ctx.actions.addUserLabel(labelPicker.iid, name);
+            setLabelPicker(null);
+          }}
+          onClose={() => setLabelPicker(null)}
         />
       )}
       <ToastTray />

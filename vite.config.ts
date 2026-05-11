@@ -13,7 +13,7 @@ export default defineConfig({
   build: {
     lib: {
       entry,
-      name: "GitLabTracker",
+      name: "Lane",
       fileName: (format) => (format === "es" ? "index.js" : "index.cjs"),
       formats: ["es", "cjs"],
     },

@@ -27,7 +27,8 @@ function makeIssue(iid: number, title: string, description: string): Issue {
 function drawerProps(issue: Issue): DrawerProps {
   return {
     issue,
-    sourceUrl: null,
+    webUrl: "https://x",
+    hasSource: false,
     notes: [],
     onClose: vi.fn(),
     onChangeState: vi.fn(),
@@ -39,7 +40,6 @@ function drawerProps(issue: Issue): DrawerProps {
     onCancelIssue: vi.fn(),
     onDeleteIssue: vi.fn(),
     onAddLabel: vi.fn(),
-    onRemoveLabel: vi.fn(),
   };
 }
 

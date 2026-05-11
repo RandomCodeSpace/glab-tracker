@@ -1,4 +1,6 @@
-# @ossrandom/glab-tracker
+# Lane
+
+> Distributed on npm as [`@ossrandom/glab-tracker`](https://www.npmjs.com/package/@ossrandom/glab-tracker).
 
 A React component that mounts a personal kanban-style tracker on top of your own GitLab account, so you can plan, flag, and reorder issues from across an entire instance without ever writing back to the projects they live in. The component reads from any GitLab project you have access to and writes only to a single private "personal tracker" project that you own — every other project is strictly read-only.
 

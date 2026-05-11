@@ -1,5 +1,7 @@
+import { useRef } from "react";
 import type { Issue, ColumnState } from "../../types/tracker";
 import { Column } from "./Column";
+import { MobileNav } from "./MobileNav";
 
 const ORDER: ColumnState[] = ["todo", "doing", "done"];
 const NAMES: Record<ColumnState, string> = {
@@ -9,14 +11,13 @@ const NAMES: Record<ColumnState, string> = {
 export interface BoardProps {
   issues: Issue[];
   selectedIid: number | null;
-  sourceUrlFor: (issue: Issue) => string | null;
+  webUrlFor: (issue: Issue) => string;
   onSelectIssue: (iid: number) => void;
   onClearFlag: (iid: number, flag: "blocked" | "reviewing") => void;
   onOpenNotes: (iid: number) => void;
 }
 
 function sortIssues(issues: Issue[]): Issue[] {
-  // reviewing-only first, then plain, then blocked (with or without reviewing)
   const rank = (i: Issue) => {
     if (i.flags.has("blocked")) return 2;
     if (i.flags.has("reviewing")) return 0;
@@ -26,26 +27,32 @@ function sortIssues(issues: Issue[]): Issue[] {
 }
 
 export function Board(props: BoardProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const counts: Record<ColumnState, number> = { todo: 0, doing: 0, done: 0, cancelled: 0 };
+  for (const i of props.issues) counts[i.state] += 1;
+
   return (
-    <div className="tracker-board">
-      {ORDER.map((s) => {
-        const inCol = sortIssues(props.issues.filter((i) => i.state === s));
-        const totalWeight = inCol.reduce((sum, i) => sum + (i.weight ?? 0), 0);
-        return (
-          <Column
-            key={s}
-            state={s}
-            name={NAMES[s]}
-            issues={inCol}
-            selectedIid={props.selectedIid}
-            sourceUrlFor={props.sourceUrlFor}
-            onSelectIssue={props.onSelectIssue}
-            onClearFlag={props.onClearFlag}
-            onOpenNotes={props.onOpenNotes}
-            totalWeight={totalWeight}
-          />
-        );
-      })}
+    <div className="tracker-boardwrap">
+      <MobileNav order={ORDER} names={NAMES} counts={counts} scrollRef={scrollRef} />
+      <div className="tracker-board" ref={scrollRef}>
+        {ORDER.map((s) => {
+          const inCol = sortIssues(props.issues.filter((i) => i.state === s));
+          return (
+            <Column
+              key={s}
+              state={s}
+              name={NAMES[s]}
+              issues={inCol}
+              selectedIid={props.selectedIid}
+              webUrlFor={props.webUrlFor}
+              onSelectIssue={props.onSelectIssue}
+              onClearFlag={props.onClearFlag}
+              onOpenNotes={props.onOpenNotes}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }

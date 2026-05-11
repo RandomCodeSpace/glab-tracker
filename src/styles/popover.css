@@ -1,5 +1,5 @@
 .tracker-popover {
-  position: absolute;
+  position: fixed;
   width: 320px;
   background: var(--surface);
   border-radius: var(--r-3);
@@ -8,7 +8,8 @@
   overflow: hidden;
   left: var(--tracker-popover-x, 0);
   top: var(--tracker-popover-y, 0);
-  z-index: 10;
+  z-index: 60;
+  animation: tracker-fade-in 140ms var(--ease-out) both;
 }
 .tracker-popover::before {
   content: "";
@@ -155,4 +156,17 @@
   height: 1px;
   background: var(--line);
   margin: 4px 0;
+}
+
+@media (max-width: 720px) {
+  .tracker-popover--labelpicker {
+    position: fixed;
+    left: 16px !important;
+    right: 16px;
+    top: 8vh !important;
+    width: auto;
+    max-height: 56vh;
+    overflow-y: auto;
+    z-index: 70;
+  }
 }

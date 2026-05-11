@@ -1,6 +1,6 @@
 {
   "name": "@ossrandom/glab-tracker",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Personal GitLab issue tracker — React component, npm-distributed.",
   "type": "module",
   "repository": {

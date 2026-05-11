@@ -19,10 +19,14 @@
 }
 .tracker-topbar__brand:hover { background: var(--surface-2); }
 .tracker-topbar__mark {
-  width: 22px; height: 22px;
+  width: 24px; height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 6px;
-  background: linear-gradient(135deg, #0855ff 0%, #6a3dff 100%);
-  box-shadow: 0 1px 2px rgba(8, 85, 255, 0.30), inset 0 0 0 1px rgba(255,255,255,0.18);
+  background: var(--ink);
+  color: var(--surface);
+  flex-shrink: 0;
 }
 .tracker-topbar__name {
   font-weight: 600; letter-spacing: -0.01em; font-size: 13.5px; color: var(--ink);
@@ -74,16 +78,19 @@
 }
 .tracker-counter {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 6px 10px;
+  height: 28px;
+  padding: 0 12px;
   border-radius: 999px;
   background: transparent; border: 0;
   cursor: pointer;
   color: var(--ink-2);
   font: inherit;
   font-size: 11.5px;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
-  transition: background-color 200ms ease, color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+  transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out), box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out);
 }
+.tracker-counter:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 2px; }
 .tracker-counter:hover { color: var(--ink); background: var(--surface-2); }
 .tracker-counter__dot { width: 6px; height: 6px; border-radius: 50%; }
 .tracker-counter__num { font-weight: 600; color: var(--ink); font-family: var(--mono); }
@@ -121,30 +128,7 @@
   box-shadow: 0 0 0 2px currentColor, 0 8px 28px var(--blocked-glow);
 }
 
-.tracker-topbar__actions { display: inline-flex; align-items: center; gap: 4px; }
-
-.tracker-iconbtn {
-  width: 32px; height: 32px;
-  display: inline-flex; align-items: center; justify-content: center;
-  color: var(--ink-2); background: transparent; border: 0;
-  border-radius: var(--r-1); cursor: pointer;
-  transition: background-color 120ms ease, color 120ms ease;
-}
-.tracker-iconbtn:hover { background: var(--surface-2); color: var(--ink); }
-.tracker-iconbtn svg { width: 15px; height: 15px; }
-
-.tracker-pill {
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 7px 12px;
-  border-radius: 999px;
-  background: var(--ink); color: var(--surface);
-  font-size: 12.5px; font-weight: 500;
-  border: 0; cursor: pointer;
-  transition: transform 120ms ease, opacity 120ms ease;
-}
-.tracker-pill:hover { opacity: 0.92; }
-.tracker-pill:active { transform: scale(0.985); }
-.tracker-pill svg { width: 13px; height: 13px; }
+.tracker-topbar__actions { display: inline-flex; align-items: center; gap: 6px; }
 
 .tracker-drag-hint {
   display: flex; justify-content: center; align-items: center;
@@ -182,9 +166,47 @@
   color: var(--ink-3); font-weight: 700; padding-right: 4px;
 }
 .tracker-filterbar__grow { flex: 1; }
-.tracker-filterbar__clear {
-  background: transparent; border: 0; color: var(--ink-3);
-  font: inherit; font-size: 11.5px; cursor: pointer; padding: 4px 8px;
-  border-radius: var(--r-1);
+.tracker-filterbar__create {
+  display: inline-flex;
+  align-items: center;
 }
-.tracker-filterbar__clear:hover { color: var(--ink); background: var(--surface-2); }
+.tracker-filterbar__create-input {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--surface);
+  border: 1px solid var(--accent-ring);
+  border-radius: 999px;
+  padding: 4px 11px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink);
+  outline: 0;
+  min-width: 120px;
+}
+.tracker-filterbar__create-input::placeholder { color: var(--ink-3); }
+.tracker-filterbar__create-input:focus { border-color: var(--accent); }
+
+@media (max-width: 720px) {
+  .tracker-topbar {
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    gap: 8px;
+    row-gap: 10px;
+  }
+  .tracker-topbar__brand { order: 1; }
+  .tracker-topbar__actions { order: 2; margin-left: auto; }
+  .tracker-paste { order: 3; flex: 1 0 100%; }
+  .tracker-counters {
+    order: 4;
+    flex: 1 0 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px;
+  }
+  .tracker-counter { padding: 6px 12px; font-size: 12px; }
+  .tracker-filterbar { padding: 8px 12px; gap: 8px; }
+}

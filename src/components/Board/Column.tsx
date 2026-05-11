@@ -7,11 +7,10 @@ export interface ColumnProps {
   name: string;
   issues: Issue[];
   selectedIid: number | null;
-  sourceUrlFor: (issue: Issue) => string | null;
+  webUrlFor: (issue: Issue) => string;
   onSelectIssue: (iid: number) => void;
   onClearFlag: (iid: number, flag: "blocked" | "reviewing") => void;
   onOpenNotes: (iid: number) => void;
-  totalWeight: number;
 }
 
 export function Column(props: ColumnProps) {
@@ -24,18 +23,13 @@ export function Column(props: ColumnProps) {
       <div className="tracker-col__head">
         <span className="tracker-col__name">{props.name}</span>
         <span className="tracker-col__count">{props.issues.length}</span>
-        {props.totalWeight > 0 && (
-          <span className="tracker-col__extras">
-            total weight <span className="tracker-col__num">w{props.totalWeight}</span>
-          </span>
-        )}
       </div>
       <div className={`tracker-col__list${isOver ? " is-over" : ""}`} ref={setNodeRef}>
         {props.issues.map((i) => (
           <Card
             key={i.iid}
             issue={i}
-            sourceUrl={props.sourceUrlFor(i)}
+            webUrl={props.webUrlFor(i)}
             isActive={props.selectedIid === i.iid}
             onSelect={() => props.onSelectIssue(i.iid)}
             onClearFlag={(f) => props.onClearFlag(i.iid, f)}

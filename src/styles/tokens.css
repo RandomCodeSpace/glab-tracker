@@ -42,6 +42,10 @@
   --r-3: 14px;
   --r-4: 20px;
 
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+
   --sans: "Geist", "Inter Tight", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --mono: "Geist Mono", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
@@ -78,4 +82,68 @@
   letter-spacing: -0.005em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: contain;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 720px) {
+  .tracker-paste input,
+  .tracker-filterbar__create-input,
+  .tracker-composer__desc,
+  .tracker-composer__newlabel,
+  .tracker-connect__field input,
+  .tracker-drawer__compose input,
+  .tracker-popover__search input,
+  .tracker-drawer__title-input,
+  .tracker-drawer__desc-input {
+    font-size: 16px;
+  }
+}
+
+.tracker-loading {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 80px 24px;
+  min-height: 60vh;
+  color: var(--ink-2);
+}
+.tracker-loading__text {
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.tracker-spinner {
+  display: inline-block;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  border-top-color: var(--accent);
+  animation: tracker-spin 0.9s linear infinite;
+}
+
+@keyframes tracker-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tracker-spinner { animation-duration: 2.4s; }
+  .tracker *, .tracker *::before, .tracker *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .tracker-spinner { animation-duration: 1.6s !important; animation-iteration-count: infinite !important; }
 }

@@ -6,14 +6,14 @@ import { FlagHeader } from "./FlagHeader";
 
 export interface CardProps {
   issue: Issue;
-  sourceUrl: string | null;
+  webUrl: string;
   onSelect?: (() => void) | undefined;
   onClearFlag?: ((flag: "blocked" | "reviewing") => void) | undefined;
   onOpenNotes?: (() => void) | undefined;
   isActive?: boolean | undefined;
 }
 
-export function Card({ issue, sourceUrl, onSelect, onClearFlag, onOpenNotes, isActive }: CardProps) {
+export function Card({ issue, webUrl, onSelect, onClearFlag, onOpenNotes, isActive }: CardProps) {
   const blocked = issue.flags.has("blocked");
   const reviewing = issue.flags.has("reviewing");
   const { setNodeRef, listeners, attributes, isDragging } = useDraggable({
@@ -53,7 +53,7 @@ export function Card({ issue, sourceUrl, onSelect, onClearFlag, onOpenNotes, isA
         <p className="tracker-card__preview">{issue.description}</p>
       ) : null}
       <CardLabels labels={issue.userLabels} />
-      <CardMeta issue={issue} sourceUrl={sourceUrl} onOpenNotes={onOpenNotes} />
+      <CardMeta issue={issue} webUrl={webUrl} onOpenNotes={onOpenNotes} />
     </article>
   );
 }

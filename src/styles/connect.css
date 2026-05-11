@@ -9,9 +9,13 @@
 }
 .tracker-connect__mark {
   width: 44px; height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 12px;
-  background: linear-gradient(135deg, #0855ff 0%, #6a3dff 100%);
-  box-shadow: 0 6px 18px rgba(8, 85, 255, 0.30), inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  background: var(--ink);
+  color: var(--surface);
+  box-shadow: 0 1px 1px rgba(26, 24, 16, 0.06), 0 8px 22px rgba(26, 24, 16, 0.10);
   margin-bottom: 22px;
 }
 .tracker-connect__title {
@@ -85,18 +89,6 @@
 .tracker-connect__field input:focus {
   border-color: var(--accent-ring); background: var(--surface);
 }
-
-.tracker-connect__go {
-  background: var(--accent); color: var(--accent-fg);
-  border: 0; padding: 9px 16px;
-  border-radius: var(--r-1);
-  font: inherit; font-weight: 600;
-  font-size: 13px; cursor: pointer;
-  box-shadow: 0 1px 2px rgba(8, 85, 255, 0.20), inset 0 0 0 1px rgba(255, 255, 255, 0.10);
-  transition: transform 120ms ease, opacity 120ms ease;
-}
-.tracker-connect__go:active { transform: scale(0.985); }
-.tracker-connect__go:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .tracker-connect__error {
   color: var(--blocked);

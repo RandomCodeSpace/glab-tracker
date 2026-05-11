@@ -1,27 +1,26 @@
 import type { Issue } from "../../types/tracker";
+import { Icon } from "../Icon";
 
 export interface CardMetaProps {
   issue: Issue;
-  sourceUrl: string | null;
+  webUrl: string;
   onOpenNotes?: (() => void) | undefined;
 }
 
-export function CardMeta({ issue, sourceUrl, onOpenNotes }: CardMetaProps) {
+export function CardMeta({ issue, webUrl, onOpenNotes }: CardMetaProps) {
   const overdue = issue.dueDate ? Date.parse(issue.dueDate) < Date.now() && issue.state !== "done" : false;
   return (
     <div className="tracker-card__meta">
-      {sourceUrl ? (
-        <a
-          className="tracker-card__source"
-          href={sourceUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Open source issue in GitLab"
-          onClick={(e) => e.stopPropagation()}
-        >
-          ↗
-        </a>
-      ) : null}
+      <a
+        className="tracker-card__source"
+        href={webUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open issue in GitLab"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Icon name="external" size={13} />
+      </a>
       {issue.dueDate ? (
         <span className={`tracker-card__due${overdue ? " is-overdue" : ""}`}>
           {issue.dueDate}
@@ -40,7 +39,8 @@ export function CardMeta({ issue, sourceUrl, onOpenNotes }: CardMetaProps) {
         onClick={(e) => { e.stopPropagation(); onOpenNotes?.(); }}
         aria-label={issue.noteCount > 0 ? `View ${issue.noteCount} notes` : "Add a note"}
       >
-        💬 {issue.noteCount > 0 ? issue.noteCount : "+ note"}
+        <Icon name="message" size={13} />
+        <span>{issue.noteCount > 0 ? issue.noteCount : "+ note"}</span>
       </button>
       {issue.divergence ? (
         <span

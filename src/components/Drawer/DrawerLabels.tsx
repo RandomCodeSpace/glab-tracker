@@ -1,27 +1,27 @@
+import { useRef } from "react";
 import type { UserLabel } from "../../types/tracker";
 import { Chip, AddChip } from "../Chip";
 
 export interface DrawerLabelsProps {
   labels: UserLabel[];
-  onAdd: () => void;
-  onRemove: (name: string) => void;
+  onAdd: (anchor: DOMRect) => void;
 }
 
-export function DrawerLabels({ labels, onAdd, onRemove }: DrawerLabelsProps) {
+export function DrawerLabels({ labels, onAdd }: DrawerLabelsProps) {
+  const addRef = useRef<HTMLButtonElement>(null);
   return (
     <div className="tracker-drawer__labels">
       {labels.map((l) => (
-        <span key={l.name} className="tracker-drawer__label-wrap">
-          <Chip name={l.name} hue={l.hue} />
-          <button
-            type="button"
-            className="tracker-drawer__label-remove"
-            aria-label={`Remove ${l.name}`}
-            onClick={() => onRemove(l.name)}
-          >×</button>
-        </span>
+        <Chip key={l.name} name={l.name} hue={l.hue} />
       ))}
-      <AddChip label="+ Add label" onClick={onAdd} />
+      <AddChip
+        ref={addRef}
+        label="+ Add label"
+        onClick={() => {
+          const rect = addRef.current?.getBoundingClientRect();
+          if (rect) onAdd(rect);
+        }}
+      />
     </div>
   );
 }
