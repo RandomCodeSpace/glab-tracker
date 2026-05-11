@@ -25,6 +25,22 @@ const PATTERNS: { re: RegExp; wrap: (s: string) => string }[] = [
       return m ? m[1] + "`" + m[2] + "`" : "`" + s + "`";
     },
   },
+  // ~labelname references (must be preceded by start/space/punct to avoid matching mid-word ~)
+  {
+    re: /(^|\s|[(\[{,;:])~[a-z0-9][\w-]*/gi,
+    wrap: (s) => {
+      const m = s.match(/^(.*?)(~[a-z0-9][\w-]*)$/i);
+      return m ? m[1] + "`" + m[2] + "`" : "`" + s + "`";
+    },
+  },
+  // %milestonename references
+  {
+    re: /(^|\s|[(\[{,;:])%[a-z0-9][\w-]*/gi,
+    wrap: (s) => {
+      const m = s.match(/^(.*?)(%[a-z0-9][\w-]*)$/i);
+      return m ? m[1] + "`" + m[2] + "`" : "`" + s + "`";
+    },
+  },
 ];
 
 export function sanitizeForGitLab(input: string, _opts: SanitizeOptions): string {

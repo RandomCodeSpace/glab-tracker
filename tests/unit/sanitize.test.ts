@@ -29,8 +29,18 @@ describe("sanitizeForGitLab", () => {
       .toBe("see #42 in this project");
   });
 
-  it("keeps own-project label refs but escapes foreign ~labels", () => {
-    expect(sanitizeForGitLab("~bug here", { ownProject })).toBe("~bug here");
+  it("backtick-wraps ~labelname references", () => {
+    expect(sanitizeForGitLab("~bug here", { ownProject })).toBe("`~bug` here");
+  });
+
+  it("backtick-wraps %milestone references", () => {
+    expect(sanitizeForGitLab("targeting %sprint-12 next", { ownProject }))
+      .toBe("targeting `%sprint-12` next");
+  });
+
+  it("does not modify ~labels or %milestones inside fenced code blocks", () => {
+    const input = "before\n```\n~bug and %sprint-12 here\n```\nafter";
+    expect(sanitizeForGitLab(input, { ownProject })).toBe(input);
   });
 
   it("keeps own-project full path issue refs (treats as same project)", () => {
