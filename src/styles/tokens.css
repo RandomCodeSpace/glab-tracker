@@ -1,96 +1,160 @@
 .tracker {
   color-scheme: light;
 
-  --canvas: #d8d0bd;
-  --surface: #e8e1ce;
-  --surface-2: #c8c0aa;
-  --line: rgba(26, 24, 16, 0.10);
-  --line-strong: rgba(26, 24, 16, 0.20);
-  --ink: #1a1810;
-  --ink-2: #5b5544;
-  --ink-3: #8a8470;
-  --ink-4: #b3ad99;
+  /* ============ NEUTRALS — cool "screen paper", not beige ============ */
+  --paper: #fbfbfc;          /* app canvas */
+  --paper-2: #f5f6f8;        /* board gutter, sunken wells */
+  --surface: #ffffff;        /* cards, drawer, popovers — elevation = pure white */
+  --surface-hover: #f7f8fa;
+  --surface-active: #eff1f4;
+  --code-bg: #f4f5f8;        /* code blocks, key-caps, mono input wells */
 
-  --accent: #1d3da8;
-  --accent-fg: #e8e1ce;
-  --accent-soft: rgba(29, 61, 168, 0.10);
-  --accent-ring: rgba(29, 61, 168, 0.26);
+  --line: #e7e9ee;           /* 1px hairline — does most structural work */
+  --line-2: #dcdfe6;         /* stronger divider */
+  --line-3: #c9cdd6;         /* input borders */
 
-  --blocked: #a8341c;
-  --blocked-soft: rgba(168, 52, 28, 0.12);
-  --blocked-glow: rgba(168, 52, 28, 0.26);
-  --reviewing: #1d6e7a;
-  --reviewing-soft: rgba(29, 110, 122, 0.12);
-  --reviewing-glow: rgba(29, 110, 122, 0.26);
-  --cancelled-mut: #5b5544;
-  --cancelled-soft: rgba(91, 85, 68, 0.10);
-  --cancelled-glow: rgba(91, 85, 68, 0.22);
+  --ink: #14161c;            /* primary text (near-black, slight blue) */
+  --ink-2: #4a4f5c;          /* secondary */
+  --ink-3: #757b8a;          /* tertiary / meta */
+  --ink-4: #9da3b0;          /* hints, placeholders, disabled */
 
-  --warn: #8b4a09;
-  --info: #1d6e7a;
-  --done: #1c6635;
+  /* legacy aliases (kept so existing CSS keeps working through the migration) */
+  --canvas: var(--paper);
+  --surface-2: var(--surface-active);
+  --line-strong: var(--line-2);
 
-  --shadow-sm: 0 1px 1px rgba(26, 24, 16, 0.08), 0 0 0 1px rgba(26, 24, 16, 0.06);
-  --shadow:    0 1px 2px rgba(26, 24, 16, 0.08), 0 4px 14px rgba(26, 24, 16, 0.10), 0 0 0 1px rgba(26, 24, 16, 0.06);
-  --shadow-lg: 0 1px 2px rgba(26, 24, 16, 0.08), 0 12px 28px rgba(26, 24, 16, 0.14), 0 36px 72px rgba(26, 24, 16, 0.12), 0 0 0 1px rgba(26, 24, 16, 0.06);
-  --shadow-drawer: -22px 0 50px -28px rgba(26, 24, 16, 0.30), 0 0 0 1px rgba(26, 24, 16, 0.08);
-  --shadow-drag: 0 16px 36px rgba(26, 24, 16, 0.28), 0 4px 12px rgba(26, 24, 16, 0.18), 0 0 0 1px rgba(26, 24, 16, 0.10);
-  --shadow-pop: 0 1px 2px rgba(26, 24, 16, 0.12), 0 18px 38px rgba(26, 24, 16, 0.20), 0 0 0 1px rgba(26, 24, 16, 0.08);
+  /* ============ ACCENT — electric indigo (the "keyword" hue) ============ */
+  --indigo-50: #eef0ff;
+  --indigo-100: #e0e3ff;
+  --indigo-200: #c6cbff;
+  --indigo-300: #a2a8ff;
+  --indigo-400: #7b82f5;
+  --indigo-500: #5b5fe6;
+  --indigo-600: #4f46e5;     /* primary — AA on white at ~5.9:1 */
+  --indigo-700: #4338ca;
+  --indigo-800: #3730a3;
 
-  --r-1: 6px;
-  --r-2: 10px;
-  --r-3: 14px;
-  --r-4: 20px;
+  --accent: var(--indigo-600);
+  --accent-hover: var(--indigo-700);
+  --accent-active: var(--indigo-800);
+  --accent-fg: #ffffff;
+  --accent-tint: var(--indigo-50);
+  --accent-tint-2: var(--indigo-100);
+  --accent-line: var(--indigo-200);
+  --accent-ring: rgba(79, 70, 229, 0.38);
+  --accent-soft: var(--indigo-50);   /* legacy name */
 
-  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
-  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
-  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  /* ============ SEMANTIC / STATE (light syntax palette) ============ */
+  --todo: var(--accent);
+  --doing: #7c3aed;          --doing-soft: #f2ebfe;
+  --done: #1a7f37;           --done-soft: #e8f5ec;
+  --cancelled: #6b7280;      --cancelled-soft: #f1f2f4;
+  --cancelled-mut: #6b7280;  --cancelled-glow: rgba(107, 114, 128, 0.22);
 
-  --sans: "Geist", "Inter Tight", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --blocked: #d1242f;        --blocked-soft: #fdecec;
+  --blocked-line: #f5b5b8;   --blocked-glow: rgba(209, 36, 47, 0.22);
+  --reviewing: #0e7c86;      --reviewing-soft: #e2f3f4;
+  --reviewing-line: #a9dde1; --reviewing-glow: rgba(14, 124, 134, 0.2);
+  --warn: #b45309;           --warn-soft: #fbf1d6;
+  --info: #0e7c86;
+
+  /* ============ LABEL HUES (7) — re-tuned, all AA on white ============ */
+  --hue-blue-bg: #e8f1ff;    --hue-blue-fg: #1f6feb;    --hue-blue-on: #ffffff;
+  --hue-violet-bg: #f2ebfe;  --hue-violet-fg: #7c3aed;  --hue-violet-on: #ffffff;
+  --hue-pink-bg: #fce9f3;    --hue-pink-fg: #bf3989;    --hue-pink-on: #ffffff;
+  --hue-amber-bg: #fbf1d6;   --hue-amber-fg: #8a5a00;   --hue-amber-on: #ffffff;
+  --hue-green-bg: #e8f5ec;   --hue-green-fg: #1a7f37;   --hue-green-on: #ffffff;
+  --hue-teal-bg: #e2f3f4;    --hue-teal-fg: #0e7c86;    --hue-teal-on: #ffffff;
+  --hue-slate-bg: #eef0f3;   --hue-slate-fg: #4a4f5c;   --hue-slate-on: #ffffff;
+
+  /* ============ TYPOGRAPHY ============ */
+  --sans: "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --mono: "Geist Mono", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-sans: var(--sans);   /* host override hook */
+  --font-mono: var(--mono);   /* host override hook */
 
-  --hue-blue-bg:    rgba(29, 61, 168, 0.12);
-  --hue-blue-fg:    #1d3490;
-  --hue-blue-on:    #e8e1ce;
-  --hue-violet-bg:  rgba(115, 50, 200, 0.12);
-  --hue-violet-fg:  #4d1f9e;
-  --hue-violet-on:  #e8e1ce;
-  --hue-pink-bg:    rgba(180, 50, 105, 0.12);
-  --hue-pink-fg:    #8c1351;
-  --hue-pink-on:    #e8e1ce;
-  --hue-amber-bg:   rgba(166, 80, 14, 0.14);
-  --hue-amber-fg:   #6f3007;
-  --hue-amber-on:   #e8e1ce;
-  --hue-green-bg:   rgba(28, 102, 53, 0.13);
-  --hue-green-fg:   #145528;
-  --hue-green-on:   #e8e1ce;
-  --hue-teal-bg:    rgba(29, 110, 122, 0.13);
-  --hue-teal-fg:    #1d6e7a;
-  --hue-teal-on:    #e8e1ce;
-  --hue-slate-bg:   rgba(26, 24, 16, 0.10);
-  --hue-slate-fg:   #2a2419;
-  --hue-slate-on:   #e8e1ce;
+  --t-meta: 11px;
+  --t-xs: 12px;
+  --t-sm: 13px;
+  --t-base: 14px;
+  --t-md: 15px;
+  --t-lg: 17px;
+  --t-xl: 21px;
+  --t-2xl: 28px;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  /* ============ SPACE (4px base) ============ */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px;  --s-4: 16px;  --s-5: 20px;
+  --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px;
+
+  /* ============ RADIUS — tighter, IDE-sharp ============ */
+  --r-1: 5px;
+  --r-2: 7px;
+  --r-3: 10px;
+  --r-4: 14px;
+  --r-full: 999px;
+
+  /* ============ ELEVATION — hairlines first, shadows minimal ============ */
+  --shadow-xs: 0 1px 1px rgba(20, 22, 28, 0.04);
+  --shadow-sm: 0 1px 2px rgba(20, 22, 28, 0.06), 0 0 0 1px var(--line);
+  --shadow-md: 0 4px 12px -2px rgba(20, 22, 28, 0.1), 0 0 0 1px var(--line);
+  --shadow-lg: 0 12px 32px -8px rgba(20, 22, 28, 0.16), 0 0 0 1px var(--line-2);
+  --shadow: var(--shadow-md);   /* legacy name */
+  --shadow-drawer: -8px 0 32px -12px rgba(20, 22, 28, 0.18), 0 0 0 1px var(--line);
+  --shadow-drag: 0 16px 36px -6px rgba(20, 22, 28, 0.22), 0 0 0 1px var(--accent-line);
+  --shadow-pop: var(--shadow-lg);
+  --ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent-ring);
+
+  /* ============ MOTION ============ */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);          /* legacy name */
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);  /* drag only */
+  --dur-1: 90ms;
+  --dur-2: 140ms;
+  --dur-3: 200ms;
+  --dur-4: 280ms;
+
+  /* ============ Z-INDEX LADDER ============ */
+  --z-board: 0;
+  --z-rail: 10;
+  --z-topbar: 20;
+  --z-drawer: 40;
+  --z-modal: 50;
+  --z-palette: 60;
+  --z-popover: 70;
+  --z-toast: 80;
 }
 
 :where(html, body) {
   height: 100%;
   margin: 0;
-  background: #d8d0bd;
+  background: #fbfbfc;
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
-:where(body) { -webkit-tap-highlight-color: transparent; }
-:where(#root) { height: 100%; }
+:where(body) {
+  -webkit-tap-highlight-color: transparent;
+}
+:where(#root) {
+  height: 100%;
+}
 
-.tracker, .tracker * { box-sizing: border-box; }
+.tracker,
+.tracker * {
+  box-sizing: border-box;
+}
 .tracker {
-  background: var(--canvas);
+  background: var(--paper);
   color: var(--ink);
-  font-family: var(--sans);
-  font-size: 13.5px;
-  line-height: 1.5;
-  letter-spacing: -0.005em;
+  font-family: var(--font-sans);
+  font-size: var(--t-base);
+  line-height: 1.55;
+  letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
@@ -100,6 +164,19 @@
   min-height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+/* Mono is used for every identifier, numeral, count, date, key-hint, code span. */
+.tracker :where(code, kbd, samp) {
+  font-family: var(--font-mono);
+}
+
+/* Shared focus-ring utility — visible focus on every interactive surface. */
+.tracker :where(a, button, input, textarea, select, [tabindex]):focus-visible,
+.tracker .focus-ring:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+  border-radius: var(--r-1);
 }
 
 @media (max-width: 720px) {
@@ -112,7 +189,7 @@
   .tracker-popover__search input,
   .tracker-drawer__title-input,
   .tracker-drawer__desc-input {
-    font-size: 16px;
+    font-size: 16px; /* iOS zoom guard */
   }
 }
 
@@ -128,33 +205,40 @@
   color: var(--ink-2);
 }
 .tracker-loading__text {
-  font-size: 12.5px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-3);
 }
 .tracker-spinner {
   display: inline-block;
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  border: 2px solid var(--line-strong);
+  border: 1.5px solid var(--line-2);
   border-top-color: var(--accent);
-  animation: tracker-spin 0.9s linear infinite;
+  animation: tracker-spin 0.8s linear infinite;
 }
 
 @keyframes tracker-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tracker-spinner { animation-duration: 2.4s; }
-  .tracker *, .tracker *::before, .tracker *::after {
+  .tracker *,
+  .tracker *::before,
+  .tracker *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  .tracker-spinner { animation-duration: 1.6s !important; animation-iteration-count: infinite !important; }
+  .tracker-spinner {
+    animation-duration: 1.6s !important;
+    animation-iteration-count: infinite !important;
+  }
 }

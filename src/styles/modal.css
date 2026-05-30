@@ -1,0 +1,111 @@
+/* modal.css — shared Modal shell (scrim, panel, enter/exit transitions).
+ * Backs the composer, confirm dialogs, command palette, and shortcuts sheet.
+ * Reduced-motion is neutralized globally in tokens.css. */
+
+/* The portal container carries `.tracker` so tokens resolve at document.body.
+ * Strip its flex/min-height layout — it must not affect the page. */
+.tracker[data-modal-portal] {
+  display: contents;
+}
+
+/* ---- scrim ---- */
+.tracker-modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-6);
+  background: rgba(20, 22, 28, 0.34);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity var(--dur-3) var(--ease-out);
+}
+.tracker-modal[data-state="open"] {
+  opacity: 1;
+}
+
+/* ---- panel ---- */
+.tracker-modal__panel {
+  position: relative;
+  width: 100%;
+  max-height: calc(100vh - var(--s-12));
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  background: var(--surface);
+  border-radius: var(--r-4);
+  box-shadow: var(--shadow-lg);
+  outline: none;
+  transition:
+    opacity var(--dur-3) var(--ease-out),
+    transform var(--dur-3) var(--ease-out);
+}
+.tracker-modal__panel[data-size="sm"] {
+  max-width: 420px;
+}
+.tracker-modal__panel[data-size="md"] {
+  max-width: 560px;
+}
+.tracker-modal__panel[data-size="lg"] {
+  max-width: 720px;
+}
+
+/* center variant: fade + slight scale from center */
+.tracker-modal__panel[data-variant="center"] {
+  opacity: 0;
+  transform: scale(0.98);
+}
+.tracker-modal__panel[data-variant="center"][data-state="open"] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* sheet variant: behaves like center on desktop, slide-up sheet on mobile */
+.tracker-modal__panel[data-variant="sheet"] {
+  opacity: 0;
+  transform: scale(0.98);
+}
+.tracker-modal__panel[data-variant="sheet"][data-state="open"] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ---- grab handle (sheet) ---- */
+.tracker-modal__grab {
+  display: none;
+  flex: none;
+  width: 36px;
+  height: 4px;
+  margin: var(--s-2) auto var(--s-1);
+  border-radius: var(--r-full);
+  background: var(--line-3);
+}
+
+/* ---- mobile: sheet docks to bottom ---- */
+@media (max-width: 720px) {
+  .tracker-modal[data-variant="sheet"] {
+    align-items: flex-end;
+    justify-content: stretch;
+    padding: 0;
+  }
+  .tracker-modal__panel[data-variant="sheet"] {
+    max-width: none;
+    max-height: 92vh;
+    border-radius: var(--r-4) var(--r-4) 0 0;
+    transform: translateY(100%);
+  }
+  .tracker-modal__panel[data-variant="sheet"][data-state="open"] {
+    transform: translateY(0);
+  }
+  .tracker-modal__panel[data-variant="sheet"] .tracker-modal__grab {
+    display: block;
+  }
+
+  /* center variant tightens its gutter but stays centered */
+  .tracker-modal[data-variant="center"] {
+    padding: var(--s-4);
+  }
+}
