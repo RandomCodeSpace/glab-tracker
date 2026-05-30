@@ -50,6 +50,11 @@ export function Card({ issue, webUrl, onSelect, onClearFlag, onOpenNotes, isActi
       ref={setRefs}
       {...listeners}
       {...attributes}
+      /* drop dnd-kit's role="button": the card holds interactive children
+         (#iid link, source link, notes button), and a button wrapping
+         interactives violates ARIA nested-interactive. Keeps tabIndex/aria-* +
+         the drag listeners; selection works via onClick + keyboard nav. */
+      role={undefined}
       className={`tracker-card${isActive ? " is-active" : ""}${isDragging ? " is-dragging" : ""}`}
       data-iid={issue.iid}
       data-focused={isFocused || undefined}

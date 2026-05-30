@@ -15,8 +15,8 @@
 
   --ink: #14161c;            /* primary text (near-black, slight blue) */
   --ink-2: #4a4f5c;          /* secondary */
-  --ink-3: #757b8a;          /* tertiary / meta */
-  --ink-4: #9da3b0;          /* hints, placeholders, disabled */
+  --ink-3: #62697a;          /* tertiary / meta — AA on white + code-bg */
+  --ink-4: #6b7280;          /* hints, placeholders, muted — AA on white */
 
   /* legacy aliases (kept so existing CSS keeps working through the migration) */
   --canvas: var(--paper);
@@ -59,7 +59,7 @@
   --info: #0e7c86;
 
   /* ============ LABEL HUES (7) — re-tuned, all AA on white ============ */
-  --hue-blue-bg: #e8f1ff;    --hue-blue-fg: #1f6feb;    --hue-blue-on: #ffffff;
+  --hue-blue-bg: #e8f1ff;    --hue-blue-fg: #1860d0;    --hue-blue-on: #ffffff;
   --hue-violet-bg: #f2ebfe;  --hue-violet-fg: #7c3aed;  --hue-violet-on: #ffffff;
   --hue-pink-bg: #fce9f3;    --hue-pink-fg: #bf3989;    --hue-pink-on: #ffffff;
   --hue-amber-bg: #fbf1d6;   --hue-amber-fg: #8a5a00;   --hue-amber-on: #ffffff;
