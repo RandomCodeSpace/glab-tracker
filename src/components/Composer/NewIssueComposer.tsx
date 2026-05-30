@@ -2,6 +2,8 @@ import { useState } from "react";
 import type { GitLabLabel } from "../../types/gitlab";
 import { Chip, AddChip } from "../Chip";
 import { hueFromName, classifyLabel } from "../../data/labels";
+import { MarkdownField } from "../common/MarkdownField";
+import { Kbd } from "../common/Kbd";
 
 export interface ComposerProps {
   allLabels: GitLabLabel[];
@@ -45,7 +47,13 @@ export function NewIssueComposer({ allLabels, onCreate, onCreateLabel, onCancel 
   };
 
   return (
-    <div className="tracker-composer">
+    <div
+      className="tracker-composer"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); void submit(); }
+        else if (e.key === "Escape") { e.preventDefault(); onCancel(); }
+      }}
+    >
       <div className="tracker-composer__label">New issue · side</div>
       <input
         autoFocus
@@ -53,13 +61,13 @@ export function NewIssueComposer({ allLabels, onCreate, onCreateLabel, onCancel 
         placeholder="What needs doing?"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); void submit(); } }}
       />
-      <textarea
-        className="tracker-composer__desc"
-        placeholder="Add a description…"
+      <MarkdownField
         value={description}
-        onChange={(e) => setDescription(e.target.value)}
+        onChange={setDescription}
+        placeholder="Add a description…"
+        ariaLabel="Issue description"
+        minRows={4}
       />
       <div className="tracker-composer__labels">
         {userLabels.map((l) => (
@@ -80,8 +88,8 @@ export function NewIssueComposer({ allLabels, onCreate, onCreateLabel, onCancel 
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") { e.preventDefault(); void createInline(); }
-              else if (e.key === "Escape") { e.preventDefault(); setDraft(""); setCreating(false); }
+              if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); void createInline(); }
+              else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); setDraft(""); setCreating(false); }
             }}
             onBlur={() => { if (!draft.trim()) setCreating(false); }}
           />
@@ -92,9 +100,13 @@ export function NewIssueComposer({ allLabels, onCreate, onCreateLabel, onCancel 
       <div className="tracker-composer__row">
         <span className="tracker-composer__state">To do</span>
         <span className="tracker-composer__grow" />
-        <button type="button" className="tracker-btn tracker-btn--ghost" onClick={onCancel}>Cancel</button>
+        <button type="button" className="tracker-btn tracker-btn--ghost" onClick={onCancel}>
+          Cancel
+          <Kbd keys="esc" />
+        </button>
         <button type="button" className="tracker-btn tracker-btn--primary" disabled={!title.trim() || busy} onClick={submit}>
           {busy ? "Creating…" : "Create"}
+          <Kbd keys="mod+enter" />
         </button>
       </div>
     </div>

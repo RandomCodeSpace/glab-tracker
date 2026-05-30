@@ -1,141 +1,306 @@
-.tracker-connect-frame {
-  background: linear-gradient(180deg, var(--surface) 0%, var(--canvas) 100%);
-}
+/* CONNECT / onboarding — full-screen editor-config feel on paper.
+   Same faint dotted-grid texture as the board canvas (~24px pitch, ~4% ink).
+   No marketing hero; left-aligned; mono step indicators + label checklist. */
 
 .tracker-connect {
-  max-width: 540px;
-  margin: 80px auto 100px;
-  padding: 0 28px;
+  flex: 1;
+  min-height: 100%;
+  padding: var(--s-12) var(--s-6) var(--s-12);
+  background-color: var(--paper);
+  background-image: radial-gradient(circle, rgba(20, 22, 28, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: -1px -1px;
+  overflow-y: auto;
+}
+
+@media print {
+  .tracker-connect { background-image: none; }
+}
+
+/* ---- header ---------------------------------------------------------------- */
+.tracker-connect__head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  max-width: 560px;
+  margin: 0 auto var(--s-8);
 }
 .tracker-connect__mark {
-  width: 44px; height: 44px;
+  flex-shrink: 0;
+  width: 38px; height: 38px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: var(--r-2);
   background: var(--ink);
   color: var(--surface);
-  box-shadow: 0 1px 1px rgba(26, 24, 16, 0.06), 0 8px 22px rgba(26, 24, 16, 0.10);
-  margin-bottom: 22px;
+  box-shadow: var(--shadow-sm);
 }
 .tracker-connect__title {
-  font-size: 30px; font-weight: 600;
-  letter-spacing: -0.022em;
-  margin: 0 0 8px;
+  font-family: var(--font-sans);
+  font-size: var(--t-xl);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 2px 0 4px;
   color: var(--ink);
 }
 .tracker-connect__lede {
   color: var(--ink-2);
-  margin: 0 0 32px;
-  font-size: 14.5px; line-height: 1.55;
+  margin: 0;
+  font-size: var(--t-sm);
+  line-height: 1.5;
+  max-width: 44ch;
 }
 
+/* ---- steps as an IDE-style config panel ------------------------------------ */
 .tracker-connect__steps {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
   background: var(--surface);
   border-radius: var(--r-3);
-  box-shadow: var(--shadow);
-  padding: 4px 0;
-  margin: 0;
-  list-style: none;
+  box-shadow: var(--shadow-md);
 }
 .tracker-connect__step {
   display: grid;
-  grid-template-columns: 36px 1fr;
-  gap: 14px;
-  padding: 18px 22px;
+  grid-template-columns: 44px 1fr;
+  gap: var(--s-3);
+  padding: var(--s-5) var(--s-5);
   border-bottom: 1px solid var(--line);
   align-items: start;
 }
 .tracker-connect__step:last-child { border-bottom: 0; }
 
+.tracker-connect__body { min-width: 0; }
+
+/* mono [1/3] / [✓] step indicator */
 .tracker-connect__num {
-  color: var(--ink-3);
-  font-family: var(--mono);
-  font-size: 11px;
-  padding-top: 3px;
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  line-height: 1.6;
+  color: var(--ink-4);
+  padding-top: 1px;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
 }
-.tracker-connect__step.is-done .tracker-connect__num { color: var(--done); }
 .tracker-connect__step.is-current .tracker-connect__num { color: var(--accent); }
+.tracker-connect__step.is-done .tracker-connect__num { color: var(--done); }
 
 .tracker-connect__step-title {
-  font-size: 14.5px; font-weight: 600;
-  margin: 0 0 4px;
-  letter-spacing: -0.008em;
+  font-family: var(--font-sans);
+  font-size: var(--t-base);
+  font-weight: var(--fw-semibold);
+  letter-spacing: -0.006em;
+  margin: 0 0 var(--s-1);
+  color: var(--ink);
 }
+.tracker-connect__step.is-current .tracker-connect__step-title,
+.tracker-connect__step.is-done .tracker-connect__step-title { color: var(--ink); }
+.tracker-connect__step:not(.is-current):not(.is-done) .tracker-connect__step-title { color: var(--ink-2); }
+
 .tracker-connect__step-desc {
   color: var(--ink-2);
-  margin: 0 0 10px;
-  font-size: 13px; line-height: 1.55;
+  margin: 0 0 var(--s-3);
+  font-size: var(--t-sm);
+  line-height: 1.5;
 }
+
+/* success line (mono) */
 .tracker-connect__ok {
-  color: var(--done); font-family: var(--mono); font-size: 11.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-top: var(--s-2);
+  color: var(--done);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
 }
+.tracker-connect__ok svg { color: var(--done); }
 
-.tracker-connect__field {
-  display: flex; align-items: center; gap: 10px;
-  margin-top: 10px;
-}
-.tracker-connect__field input {
-  flex: 1;
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  border-radius: var(--r-1);
-  outline: 0;
-  padding: 9px 12px;
-  color: var(--ink); font: inherit;
-  font-size: 14px;
-  font-family: var(--mono);
-}
-.tracker-connect__field input:focus {
-  border-color: var(--accent-ring); background: var(--surface);
-}
-
-.tracker-connect__error {
-  color: var(--blocked);
-  font-size: 12.5px;
-  margin-top: 10px;
-  font-family: var(--mono);
-}
-
-.tracker-connect__choice {
-  display: flex; align-items: center; gap: 8px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-}
-
-.tracker-connect__token {
+/* ---- mono code-bg inputs (token + project id) ------------------------------ */
+.tracker-connect__inputwrap {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
+  align-items: stretch;
+  background: var(--code-bg);
+  border: 1px solid var(--line-3);
+  border-radius: var(--r-1);
+  overflow: hidden;
 }
-.tracker-connect__token input {
-  background: var(--surface-2);
-  border: 1px solid var(--line);
+.tracker-connect__inputwrap:focus-within {
+  border-color: var(--accent);
+  box-shadow: var(--ring);
+}
+
+.tracker-connect__input {
+  flex: 1;
+  min-width: 0;
+  background: var(--code-bg);
+  border: 1px solid var(--line-3);
   border-radius: var(--r-1);
   outline: 0;
   padding: 9px 12px;
   color: var(--ink);
-  font: inherit;
-  font-size: 14px;
-  font-family: var(--mono);
-  width: 100%;
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+  letter-spacing: -0.01em;
 }
-.tracker-connect__token input:focus {
-  border-color: var(--accent-ring); background: var(--surface);
+.tracker-connect__input::placeholder { color: var(--ink-4); }
+.tracker-connect__input:focus-visible {
+  border-color: var(--accent);
+  box-shadow: var(--ring);
+}
+/* token field input sits inside the wrap — drop its own border/radius there */
+.tracker-connect__inputwrap .tracker-connect__input {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.tracker-connect__inputwrap .tracker-connect__input:focus-visible {
+  box-shadow: none;
+}
+.tracker-connect__input--num { text-align: left; }
+
+/* inline paste affordance on the token field */
+.tracker-connect__paste {
+  flex-shrink: 0;
+  border: 0;
+  border-left: 1px solid var(--line-2);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  padding: 0 12px;
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
+}
+.tracker-connect__paste:hover { background: var(--surface-hover); color: var(--ink); }
+.tracker-connect__paste:focus-visible { outline: none; box-shadow: var(--ring); }
+
+/* ---- token form layout ----------------------------------------------------- */
+.tracker-connect__token {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
 }
 .tracker-connect__token-row {
-  display: flex; align-items: center; gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
   flex-wrap: wrap;
 }
 .tracker-connect__token-hint {
-  font-size: 12px;
+  font-size: var(--t-xs);
   color: var(--ink-3);
+  line-height: 1.5;
 }
 .tracker-connect__token-hint code {
-  font-family: var(--mono);
-  background: var(--surface-2);
+  font-family: var(--font-mono);
+  background: var(--code-bg);
   padding: 1px 5px;
   border-radius: 3px;
-  font-size: 11.5px;
+  font-size: var(--t-meta);
+  color: var(--ink-2);
+}
+.tracker-connect__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--accent);
+  text-decoration: none;
+}
+.tracker-connect__link:hover { color: var(--accent-hover); text-decoration: underline; }
+.tracker-connect__link:focus-visible { outline: none; box-shadow: var(--ring); border-radius: var(--r-1); }
+.tracker-connect__link svg { color: currentColor; }
+
+/* ---- project-id field + oauth choice --------------------------------------- */
+.tracker-connect__field {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.tracker-connect__field .tracker-connect__input { max-width: 180px; }
+
+.tracker-connect__choice {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+}
+
+/* ---- inline blocked error (not an alert dialog) ---------------------------- */
+.tracker-connect__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  margin-top: var(--s-1);
+  padding: 8px 10px;
+  background: var(--blocked-soft);
+  border: 1px solid var(--blocked-line);
+  border-radius: var(--r-1);
+  color: var(--blocked);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  line-height: 1.45;
+}
+.tracker-connect__error svg { color: var(--blocked); flex-shrink: 0; margin-top: 1px; }
+
+/* ---- bootstrap label checklist --------------------------------------------- */
+.tracker-connect__checklist {
+  list-style: none;
+  margin: 0 0 var(--s-1);
+  padding: 10px 12px;
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tracker-connect__checkrow {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+  transition: color var(--dur-2) var(--ease-out);
+}
+.tracker-connect__checkrow.is-resolved { color: var(--ink); }
+.tracker-connect__checkmark {
+  flex-shrink: 0;
+  width: 14px; height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-4);
+}
+.tracker-connect__checkrow.is-resolved .tracker-connect__checkmark { color: var(--done); }
+.tracker-connect__labelname { letter-spacing: -0.01em; }
+
+/* per-row spinner that resolves to a check */
+.tracker-connect__rowspin {
+  display: inline-block;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-2);
+  border-top-color: var(--accent);
+  animation: tracker-spin 0.8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tracker-connect__rowspin {
+    animation-duration: 1.6s !important;
+  }
+}
+
+/* ---- responsive ------------------------------------------------------------ */
+@media (max-width: 720px) {
+  .tracker-connect { padding: var(--s-8) var(--s-4) var(--s-10); }
+  .tracker-connect__step { padding: var(--s-4); grid-template-columns: 40px 1fr; gap: var(--s-2); }
+  .tracker-connect__input { font-size: 16px; } /* iOS zoom guard */
+  .tracker-connect__field .tracker-connect__input { max-width: none; }
 }

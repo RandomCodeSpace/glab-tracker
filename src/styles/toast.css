@@ -1,19 +1,158 @@
+/* toast.css — bottom-right notification stack. Each toast is a --surface
+   card on a hairline with a left accent-rail colored by kind, a mono action
+   affordance, and a thin auto-dismiss progress hairline along the bottom.
+   Light terminal/IDE feel: tight radii, minimal shadow, quiet fast motion. */
+
 .tracker-toast-tray {
   position: fixed;
-  bottom: 24px; right: 24px;
-  display: flex; flex-direction: column; gap: 10px;
-  z-index: 9999;
+  bottom: var(--s-6);
+  right: var(--s-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  z-index: var(--z-toast);
+  max-width: min(380px, calc(100vw - var(--s-8)));
+  pointer-events: none;
 }
+
 .tracker-toast {
-  display: inline-flex; align-items: center; gap: 12px;
-  padding: 10px 14px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-3) var(--s-3) var(--s-4);
   background: var(--surface);
-  border-radius: var(--r-2);
+  border-radius: var(--r-3);
   box-shadow: var(--shadow-lg);
   color: var(--ink);
-  font-size: 13px;
+  font-size: var(--t-sm);
+  line-height: 1.45;
+  overflow: hidden;
+  pointer-events: auto;
+  animation: tracker-toast-in var(--dur-3) var(--ease-out);
 }
-.tracker-toast--error { border-left: 3px solid var(--blocked); }
-.tracker-toast--info  { border-left: 3px solid var(--accent); }
-.tracker-toast--undo  { border-left: 3px solid var(--warn); }
-.tracker-toast button { background: transparent; border: 0; color: inherit; cursor: pointer; }
+
+/* Left accent-rail — full-height bar colored by kind. */
+.tracker-toast__rail {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--accent);
+}
+.tracker-toast--info .tracker-toast__rail {
+  background: var(--accent);
+}
+.tracker-toast--error .tracker-toast__rail {
+  background: var(--blocked);
+}
+.tracker-toast--undo .tracker-toast__rail {
+  background: var(--done);
+}
+
+.tracker-toast__message {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--ink);
+}
+
+/* Mono action affordance ("Undo"), with an inline key-hint. */
+.tracker-toast__action {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: 3px var(--s-2);
+  background: transparent;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-1);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition: background var(--dur-1) var(--ease-out),
+    border-color var(--dur-1) var(--ease-out);
+}
+.tracker-toast__action:hover {
+  background: var(--surface-hover);
+  border-color: var(--line-3);
+}
+
+.tracker-toast__kbd {
+  /* slightly muted relative to the action label */
+  opacity: 0.9;
+}
+
+/* Dismiss control — quiet glyph button. */
+.tracker-toast__close {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: var(--r-1);
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: color var(--dur-1) var(--ease-out),
+    background var(--dur-1) var(--ease-out);
+}
+.tracker-toast__close:hover {
+  color: var(--ink);
+  background: var(--surface-hover);
+}
+
+/* Auto-dismiss progress hairline along the bottom edge, tinted by kind.
+   Duration is driven per-toast via --toast-dur (matches the JS timer). */
+.tracker-toast__progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  transform-origin: left center;
+  background: var(--accent);
+  opacity: 0.45;
+  animation: tracker-toast-progress var(--toast-dur, 4000ms) linear forwards;
+}
+.tracker-toast--info .tracker-toast__progress {
+  background: var(--accent);
+}
+.tracker-toast--error .tracker-toast__progress {
+  background: var(--blocked);
+}
+.tracker-toast--undo .tracker-toast__progress {
+  background: var(--done);
+}
+
+@keyframes tracker-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tracker-toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* Under reduced-motion the global rule neutralizes the entry/progress
+   animations; pin the progress hairline to a static full bar so it does not
+   sit collapsed. */
+@media (prefers-reduced-motion: reduce) {
+  .tracker-toast__progress {
+    transform: scaleX(1);
+  }
+}

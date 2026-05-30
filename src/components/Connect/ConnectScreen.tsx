@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Logo } from "../Logo";
+import { Icon } from "../Icon";
+import { SYSTEM_LABEL_NAMES } from "../../data/labels";
 
 export type ConnectStep = "authorize" | "project-id" | "bootstrap" | "done";
 
@@ -43,39 +45,75 @@ export function ConnectScreen(p: ConnectScreenProps) {
     if (!r.ok) setTokenError(r.error ?? "Could not connect");
   }
 
+  async function pasteToken() {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) { setToken(text.trim()); setTokenError(null); }
+    } catch {
+      // Clipboard read denied/unavailable — user can paste manually into the field.
+    }
+  }
+
+  const patUrl = `https://${p.instanceHost}/-/user_settings/personal_access_tokens`;
+  const authDone = !!p.username;
+  const pidDone = p.step === "bootstrap" || p.step === "done";
+
   return (
     <section className="tracker-connect">
-      <div className="tracker-connect__mark" aria-hidden>
-        <Logo size={26} />
-      </div>
-      <h1 className="tracker-connect__title">Connect to Lane.</h1>
-      <p className="tracker-connect__lede">
-        A private GitLab project becomes your second brain. Three steps and you're in.
-      </p>
+      <header className="tracker-connect__head">
+        <span className="tracker-connect__mark" aria-hidden>
+          <Logo size={22} />
+        </span>
+        <div>
+          <h1 className="tracker-connect__title">Connect Lane</h1>
+          <p className="tracker-connect__lede">
+            A private GitLab project becomes your tracker. Three steps, all local.
+          </p>
+        </div>
+      </header>
+
       <ol className="tracker-connect__steps">
-        <li className={`tracker-connect__step${p.step === "authorize" ? " is-current" : ""}${p.username ? " is-done" : ""}`}>
-          <span className="tracker-connect__num">01</span>
-          <div>
+        {/* ---- 01 · authorize ------------------------------------------------ */}
+        <li className={`tracker-connect__step${p.step === "authorize" ? " is-current" : ""}${authDone ? " is-done" : ""}`}>
+          <span className="tracker-connect__num">{authDone ? "[✓]" : "[1/3]"}</span>
+          <div className="tracker-connect__body">
             <div className="tracker-connect__step-title">
               {p.oauthEnabled ? `Authorize on ${p.instanceHost}` : `Connect to ${p.instanceHost}`}
             </div>
             <div className="tracker-connect__step-desc">
               {p.oauthEnabled
-                ? "OAuth 2.0 with PKCE, or use a personal/project access token. Tokens live in IndexedDB on this device only."
+                ? "OAuth 2.0 with PKCE, or a personal/project access token. Tokens live in IndexedDB on this device only."
                 : "Paste a personal or project access token with the api scope. Stored in IndexedDB on this device only."}
             </div>
-            {p.username ? (
-              <div className="tracker-connect__ok">✓ Connected as @{p.username}</div>
+
+            {authDone ? (
+              <div className="tracker-connect__ok">
+                <Icon name="check" size={13} />
+                <span>Connected as @{p.username}</span>
+              </div>
             ) : (showTokenForm || !p.oauthEnabled) ? (
               <div className="tracker-connect__token">
-                <input
-                  type="password"
-                  autoFocus
-                  placeholder="glpat-… or project access token"
-                  value={token}
-                  onChange={(e) => setToken(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && submitToken()}
-                />
+                <div className="tracker-connect__inputwrap">
+                  <input
+                    className="tracker-connect__input"
+                    type="password"
+                    autoFocus
+                    autoComplete="off"
+                    spellCheck={false}
+                    placeholder="glpat-… or project access token"
+                    value={token}
+                    onChange={(e) => setToken(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && submitToken()}
+                  />
+                  <button
+                    type="button"
+                    className="tracker-connect__paste"
+                    onClick={pasteToken}
+                    title="Paste from clipboard"
+                  >
+                    Paste
+                  </button>
+                </div>
                 <div className="tracker-connect__token-row">
                   <button type="button" className="tracker-btn tracker-btn--primary" disabled={tokenBusy} onClick={submitToken}>
                     {tokenBusy ? "Verifying…" : "Connect with token"}
@@ -87,9 +125,18 @@ export function ConnectScreen(p: ConnectScreenProps) {
                   )}
                 </div>
                 <div className="tracker-connect__token-hint">
-                  Needs the <code>api</code> scope. Settings → Access Tokens on {p.instanceHost}.
+                  Needs the <code>api</code> scope.{" "}
+                  <a className="tracker-connect__link" href={patUrl} target="_blank" rel="noreferrer">
+                    Create one on {p.instanceHost}
+                    <Icon name="link-external" size={12} />
+                  </a>
                 </div>
-                {tokenError && <div className="tracker-connect__error">{tokenError}</div>}
+                {tokenError && (
+                  <div className="tracker-connect__error" role="alert">
+                    <Icon name="block" size={13} />
+                    <span>{tokenError}</span>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="tracker-connect__choice">
@@ -99,40 +146,70 @@ export function ConnectScreen(p: ConnectScreenProps) {
             )}
           </div>
         </li>
-        <li className={`tracker-connect__step${p.step === "project-id" ? " is-current" : ""}${p.step === "bootstrap" || p.step === "done" ? " is-done" : ""}`}>
-          <span className="tracker-connect__num">02</span>
-          <div>
+
+        {/* ---- 02 · project id ---------------------------------------------- */}
+        <li className={`tracker-connect__step${p.step === "project-id" ? " is-current" : ""}${pidDone ? " is-done" : ""}`}>
+          <span className="tracker-connect__num">{pidDone ? "[✓]" : "[2/3]"}</span>
+          <div className="tracker-connect__body">
             <div className="tracker-connect__step-title">Tracker project</div>
             <div className="tracker-connect__step-desc">
-              Paste the numeric project ID of your private GitLab project. The component refuses to operate on non-private projects.
+              The numeric ID of your private GitLab project. Lane refuses to operate on non-private projects.
             </div>
             {p.step === "project-id" && (
-              <div className="tracker-connect__field">
-                <input
-                  placeholder="18472"
-                  value={pidStr}
-                  onChange={(e) => setPidStr(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && submit()}
-                />
-                <button type="button" className="tracker-btn tracker-btn--primary" disabled={busy} onClick={submit}>
-                  {busy ? "Connecting…" : "Connect"}
-                </button>
-              </div>
+              <>
+                <div className="tracker-connect__field">
+                  <input
+                    className="tracker-connect__input tracker-connect__input--num"
+                    inputMode="numeric"
+                    autoFocus
+                    spellCheck={false}
+                    placeholder="18472"
+                    value={pidStr}
+                    onChange={(e) => setPidStr(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && submit()}
+                  />
+                  <button type="button" className="tracker-btn tracker-btn--primary" disabled={busy} onClick={submit}>
+                    {busy ? "Connecting…" : "Connect"}
+                  </button>
+                </div>
+                {error && (
+                  <div className="tracker-connect__error" role="alert">
+                    <Icon name="block" size={13} />
+                    <span>{error}</span>
+                  </div>
+                )}
+              </>
             )}
-            {error && <div className="tracker-connect__error">{error}</div>}
           </div>
         </li>
+
+        {/* ---- 03 · bootstrap ----------------------------------------------- */}
         <li className={`tracker-connect__step${p.step === "bootstrap" ? " is-current" : ""}${p.step === "done" ? " is-done" : ""}`}>
-          <span className="tracker-connect__num">03</span>
-          <div>
+          <span className="tracker-connect__num">{p.step === "done" ? "[✓]" : "[3/3]"}</span>
+          <div className="tracker-connect__body">
             <div className="tracker-connect__step-title">Bootstrap labels</div>
             <div className="tracker-connect__step-desc">
-              Creates state::todo · state::doing · state::done · state::cancelled, flag::blocked · flag::reviewing,
-              src::bau · src::side. Idempotent.
+              Creates the system labels Lane uses for state, flags, and sources. Idempotent.
             </div>
+            {(p.step === "bootstrap" || p.step === "done") && (
+              <ul className="tracker-connect__checklist" aria-label="System labels">
+                {SYSTEM_LABEL_NAMES.map((name) => {
+                  const resolved = !!p.bootstrapResult;
+                  return (
+                    <li key={name} className={`tracker-connect__checkrow${resolved ? " is-resolved" : ""}`}>
+                      <span className="tracker-connect__checkmark" aria-hidden>
+                        {resolved ? <Icon name="check" size={13} /> : <span className="tracker-connect__rowspin" />}
+                      </span>
+                      <span className="tracker-connect__labelname">{name}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
             {p.bootstrapResult && (
               <div className="tracker-connect__ok">
-                ✓ {p.bootstrapResult.created.length} created, {p.bootstrapResult.alreadyPresent.length} already present
+                <Icon name="check" size={13} />
+                <span>{p.bootstrapResult.created.length} created, {p.bootstrapResult.alreadyPresent.length} already present</span>
               </div>
             )}
           </div>

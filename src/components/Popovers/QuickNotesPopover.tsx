@@ -1,4 +1,6 @@
 import { useEffect, useRef, type KeyboardEvent, type CSSProperties } from "react";
+import { Icon } from "../Icon";
+import { Kbd } from "../common/Kbd";
 import type { StreamNote } from "../Drawer/Stream";
 
 export interface QuickNotesPopoverProps {
@@ -32,29 +34,38 @@ export function QuickNotesPopover({ notes, onSubmit, onViewAll, onClose, anchorR
     ? ({ "--tracker-popover-x": `${anchorRect.left}px`, "--tracker-popover-y": `${anchorRect.bottom + 8}px` } as CSSProperties)
     : undefined;
 
+  const recent = notes.slice(-3).reverse();
+
   return (
-    <div ref={ref} className="tracker-popover" style={positionStyle}>
+    <div ref={ref} className="tracker-popover tracker-popover--notes" style={positionStyle} role="dialog" aria-label="Quick notes">
       <div className="tracker-popover__head">
         <span className="tracker-popover__title">Notes</span>
         <span className="tracker-popover__count">{notes.length}</span>
       </div>
       <div className="tracker-popover__list">
-        {notes.slice(-3).reverse().map((n, i) => (
-          <div key={i} className="tracker-popover__entry">
-            <div className="tracker-popover__entry-meta">
-              <span className="tracker-popover__entry-who">{n.author}</span>
-              <span>{n.createdAt}</span>
+        {recent.length === 0 ? (
+          <div className="tracker-popover__empty">No notes yet</div>
+        ) : (
+          recent.map((n, i) => (
+            <div key={i} className="tracker-popover__entry">
+              <div className="tracker-popover__entry-meta">
+                <span className="tracker-popover__entry-who">{n.author}</span>
+                <span className="tracker-popover__entry-when">{n.createdAt}</span>
+              </div>
+              <div className="tracker-popover__entry-body">{n.body}</div>
             </div>
-            <div className="tracker-popover__entry-body">{n.body}</div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
       <div className="tracker-popover__compose">
-        <input autoFocus placeholder="Add a quick note…" onKeyDown={onKey} />
-        <span className="tracker-popover__hint">⏎</span>
+        <input autoFocus placeholder="Add a quick note…" onKeyDown={onKey} aria-label="Add a quick note" />
+        <Kbd keys="mod+enter" className="tracker-popover__hint" />
       </div>
       <div className="tracker-popover__foot">
-        <button type="button" className="tracker-popover__all" onClick={onViewAll}>View all in drawer →</button>
+        <button type="button" className="tracker-popover__all" onClick={onViewAll}>
+          View all in drawer
+          <Icon name="arrow-right" size={13} />
+        </button>
       </div>
     </div>
   );
