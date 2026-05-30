@@ -8,11 +8,13 @@ export interface FlagHeaderProps {
 
 export function FlagHeader({ flag, reason, onClear }: FlagHeaderProps) {
   const label = flag === "blocked" ? "Blocked" : "Reviewing";
+  const glyph = flag === "blocked" ? "!" : "~";
+  const tag = flag === "blocked" ? "BLOCKED" : "REVIEWING";
   return (
     <span className={`tracker-card__flag-line tracker-card__flag-line--${flag}`}>
-      <span className="tracker-card__flag-dot" />
-      {label}
-      {reason ? <span className="tracker-card__flag-ctx">· {reason}</span> : null}
+      <span className="tracker-card__flag-glyph" aria-hidden>{glyph}</span>
+      <span className="tracker-card__flag-label">{tag}</span>
+      {reason ? <span className="tracker-card__flag-ctx" title={reason}>{reason}</span> : null}
       {onClear ? (
         <button
           type="button"

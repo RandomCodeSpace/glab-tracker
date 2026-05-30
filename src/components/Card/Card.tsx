@@ -48,7 +48,19 @@ export function Card({ issue, webUrl, onSelect, onClearFlag, onOpenNotes, isActi
           )}
         </div>
       )}
-      <h3 className="tracker-card__title">{issue.title}</h3>
+      <div className="tracker-card__head">
+        <h3 className="tracker-card__title">{issue.title}</h3>
+        <a
+          className="tracker-card__iid"
+          href={webUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Issue #${issue.iid} in GitLab`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          #{issue.iid}
+        </a>
+      </div>
       {issue.description ? (
         <p className="tracker-card__preview">{issue.description}</p>
       ) : null}

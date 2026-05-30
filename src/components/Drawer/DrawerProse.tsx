@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Markdown } from "../../utils/markdown";
+import { MarkdownField } from "../common/MarkdownField";
 
 export interface DrawerProseProps {
   title: string;
@@ -10,22 +10,23 @@ export interface DrawerProseProps {
 
 export function DrawerProse({ title, description, onEditTitle, onEditDescription }: DrawerProseProps) {
   const [editingTitle, setEditingTitle] = useState(false);
-  const [editingDesc, setEditingDesc] = useState(false);
   const [draftTitle, setDraftTitle] = useState(title);
   const [draftDesc, setDraftDesc] = useState(description);
+  const [savedDesc, setSavedDesc] = useState(false);
 
   return (
-    <>
+    <div className="tracker-drawer__prose-wrap">
       {editingTitle ? (
         <input
           autoFocus
           className="tracker-drawer__title-input"
+          aria-label="Issue title"
           value={draftTitle}
           onChange={(e) => setDraftTitle(e.target.value)}
           onBlur={() => { onEditTitle(draftTitle); setEditingTitle(false); }}
           onKeyDown={(e) => {
             if (e.key === "Enter") { e.preventDefault(); (e.target as HTMLInputElement).blur(); }
-            if (e.key === "Escape") { setDraftTitle(title); setEditingTitle(false); }
+            if (e.key === "Escape") { e.stopPropagation(); setDraftTitle(title); setEditingTitle(false); }
           }}
         />
       ) : (
@@ -34,20 +35,20 @@ export function DrawerProse({ title, description, onEditTitle, onEditDescription
         </h1>
       )}
 
-      {editingDesc ? (
-        <textarea
-          autoFocus
-          className="tracker-drawer__desc-input"
-          value={draftDesc}
-          onChange={(e) => setDraftDesc(e.target.value)}
-          onBlur={() => { onEditDescription(draftDesc); setEditingDesc(false); }}
-          onKeyDown={(e) => { if (e.key === "Escape") { setDraftDesc(description); setEditingDesc(false); } }}
-        />
-      ) : (
-        <div className="tracker-drawer__prose" onClick={() => { setDraftDesc(description); setEditingDesc(true); }}>
-          {description ? <Markdown>{description}</Markdown> : <em className="tracker-drawer__empty">Add a description…</em>}
-        </div>
-      )}
-    </>
+      <MarkdownField
+        value={draftDesc}
+        onChange={(v) => { setDraftDesc(v); setSavedDesc(false); }}
+        onBlur={() => {
+          if (draftDesc !== description) {
+            onEditDescription(draftDesc);
+            setSavedDesc(true);
+          }
+        }}
+        placeholder="Describe this issue…"
+        ariaLabel="Issue description"
+        minRows={4}
+        submitHint={savedDesc ? <span className="tracker-drawer__saved">saved</span> : undefined}
+      />
+    </div>
   );
 }

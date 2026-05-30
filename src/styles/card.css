@@ -1,143 +1,337 @@
 .tracker-card {
   position: relative;
   background: var(--surface);
-  border-radius: var(--r-3);
-  padding: 18px 20px 16px;
+  border-radius: var(--r-2);
+  padding: var(--s-3) var(--s-4) 11px;
   box-shadow: var(--shadow-sm);
   cursor: grab;
   overflow: hidden;
-  transition: box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out), opacity 200ms var(--ease-out);
+  transition:
+    box-shadow var(--dur-1) var(--ease-out),
+    transform var(--dur-1) var(--ease-out),
+    opacity var(--dur-2) var(--ease-out);
 }
-.tracker-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
-.tracker-card:active { cursor: grabbing; }
-.tracker-card.is-active { box-shadow: 0 0 0 2px var(--accent-ring), var(--shadow); }
+.tracker-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+.tracker-card:active {
+  cursor: grabbing;
+}
 
+/* Focused (keyboard) / selected — active-editor-line metaphor:
+   a 2px accent left-rail + focus ring. data-focused is the Phase 4 hook. */
+.tracker-card.is-active,
+.tracker-card[data-focused] {
+  box-shadow: var(--ring), var(--shadow-md);
+}
+.tracker-card.is-active::before,
+.tracker-card[data-focused]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--accent);
+}
+
+/* Flag left-rail — recolours to the semantic hue. */
 .tracker-card[data-blocked]:not([data-reviewing])::before {
-  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
   background: var(--blocked);
 }
 .tracker-card[data-reviewing]:not([data-blocked])::before {
-  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
   background: var(--reviewing);
 }
 .tracker-card[data-blocked][data-reviewing]::before {
-  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
   background: linear-gradient(
     to bottom,
-    var(--blocked) 0%, var(--blocked) 49%,
-    transparent 49%, transparent 51%,
-    var(--reviewing) 51%, var(--reviewing) 100%
+    var(--blocked) 0%,
+    var(--blocked) 49%,
+    transparent 49%,
+    transparent 51%,
+    var(--reviewing) 51%,
+    var(--reviewing) 100%
   );
 }
-.tracker-card[data-blocked] { opacity: 0.92; }
-.tracker-card[data-blocked] .tracker-card__title { color: var(--ink-2); }
+/* Selection/focus rail wins over the flag rail when both apply. */
+.tracker-card.is-active[data-blocked]::before,
+.tracker-card.is-active[data-reviewing]::before,
+.tracker-card[data-focused][data-blocked]::before,
+.tracker-card[data-focused][data-reviewing]::before {
+  background: var(--accent);
+}
 
-.tracker-card__flag-stack {
-  display: flex; flex-direction: column; gap: 4px;
-  margin-bottom: 10px;
+.tracker-card[data-blocked] .tracker-card__title {
+  color: var(--ink-2);
 }
-.tracker-card__flag-line {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 10px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.10em;
-  line-height: 1.2;
-}
-.tracker-card__flag-dot { width: 5px; height: 5px; border-radius: 50%; }
-.tracker-card__flag-ctx {
-  font-weight: 500; opacity: 0.85;
-  text-transform: none; letter-spacing: -0.005em;
-  font-size: 11px;
-}
-.tracker-card__flag-line--blocked { color: var(--blocked); }
-.tracker-card__flag-line--blocked .tracker-card__flag-dot { background: var(--blocked); }
-.tracker-card__flag-line--reviewing { color: var(--reviewing); }
-.tracker-card__flag-line--reviewing .tracker-card__flag-dot { background: var(--reviewing); }
-.tracker-card__flag-clear {
-  margin-left: auto;
-  width: 16px; height: 16px;
-  display: inline-flex; align-items: center; justify-content: center;
-  color: currentColor; opacity: 0;
-  border-radius: 4px; cursor: pointer;
-  transition: opacity 120ms ease, background 120ms ease;
-}
-.tracker-card:hover .tracker-card__flag-clear { opacity: 0.5; }
-.tracker-card__flag-clear:hover { opacity: 1; background: rgba(26, 24, 16, 0.08); }
-.tracker-card__flag-clear svg { width: 9px; height: 9px; }
 
+/* ---- Header row: title + #iid ------------------------------------------- */
+.tracker-card__head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  margin-bottom: var(--s-1);
+}
 .tracker-card__title {
-  font-size: 15px; font-weight: 600; color: var(--ink);
-  line-height: 1.34; letter-spacing: -0.012em;
-  margin-bottom: 6px;
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-sans);
+  font-size: var(--t-base);
+  font-weight: var(--fw-medium);
+  color: var(--ink);
+  line-height: 1.38;
+  margin: 0;
   word-break: break-word;
-}
-.tracker-card__preview {
-  color: var(--ink-2); font-size: 12.5px; line-height: 1.5;
-  margin-bottom: 12px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-.tracker-card__labels {
-  display: flex; flex-wrap: wrap; gap: 5px;
-  margin-bottom: 12px;
-}
-.tracker-card__meta {
-  display: flex; align-items: center; gap: 12px;
-  color: var(--ink-3);
-  font-size: 11.5px;
+.tracker-card__iid {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  padding-top: 10px;
+  font-size: var(--t-xs);
+  line-height: 1.5;
+  color: var(--ink-3);
+  text-decoration: none;
+  transition: color var(--dur-1) var(--ease-out);
+}
+.tracker-card__iid:hover {
+  color: var(--accent);
+}
+
+.tracker-card__preview {
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  line-height: 1.5;
+  margin: 0 0 var(--s-3);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---- Labels ------------------------------------------------------------- */
+.tracker-card__labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+  margin-bottom: var(--s-3);
+}
+.tracker-card__label-more {
+  display: inline-flex;
+  align-items: center;
+  height: 19px;
+  padding: 0 6px;
+  border-radius: var(--r-1);
+  background: var(--surface-active);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-meta);
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  cursor: default;
+}
+
+/* ---- Flags (lint-marker tags) ------------------------------------------- */
+.tracker-card__flag-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-1);
+  margin-bottom: var(--s-2);
+}
+.tracker-card__flag-line {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  max-width: 100%;
+  height: 18px;
+  padding: 0 var(--s-2);
+  border-radius: var(--r-1);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.tracker-card__flag-glyph {
+  font-weight: var(--fw-semibold);
+}
+.tracker-card__flag-label {
+  flex-shrink: 0;
+}
+.tracker-card__flag-ctx {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: var(--fw-regular);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink-2);
+}
+.tracker-card__flag-line--blocked {
+  color: var(--blocked);
+  background: var(--blocked-soft);
+}
+.tracker-card__flag-line--reviewing {
+  color: var(--reviewing);
+  background: var(--reviewing-soft);
+}
+.tracker-card__flag-clear {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: var(--s-1);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: currentColor;
+  opacity: 0;
+  border-radius: var(--r-1);
+  cursor: pointer;
+  font: inherit;
+  line-height: 1;
+  transition:
+    opacity var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out);
+}
+.tracker-card:hover .tracker-card__flag-clear {
+  opacity: 0.6;
+}
+.tracker-card__flag-clear:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+.tracker-card__flag-clear:focus-visible {
+  opacity: 1;
+}
+
+/* ---- Meta row ----------------------------------------------------------- */
+.tracker-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  font-variant-numeric: tabular-nums;
+  padding-top: var(--s-2);
   border-top: 1px solid var(--line);
 }
-.tracker-card__source {
-  display: inline-flex; align-items: center;
-  color: var(--ink-3); line-height: 0;
-  transition: color 120ms ease;
+.tracker-card__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
-.tracker-card__source:hover { color: var(--accent); }
-.tracker-card__source svg { width: 12px; height: 12px; }
-.tracker-card__due { font-family: var(--mono); }
-.tracker-card__due.is-overdue { color: var(--warn); }
-.tracker-card__weight { font-family: var(--mono); }
-.tracker-card__sep { color: var(--ink-4); }
-.tracker-card__spacer { flex: 1; }
+.tracker-card__meta svg {
+  width: 13px;
+  height: 13px;
+}
+.tracker-card__source {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink-3);
+  line-height: 0;
+  transition: color var(--dur-1) var(--ease-out);
+}
+.tracker-card__source:hover {
+  color: var(--accent);
+}
+.tracker-card__due.is-overdue {
+  color: var(--blocked);
+}
+.tracker-card__sep {
+  color: var(--ink-4);
+}
+.tracker-card__spacer {
+  flex: 1;
+}
 .tracker-card__divergence {
-  width: 7px; height: 7px;
-  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-meta);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.03em;
+  color: var(--warn);
   cursor: help;
 }
-.tracker-card__divergence.is-warn { background: var(--warn); box-shadow: 0 0 0 4px rgba(181, 86, 13, 0.10); }
-.tracker-card__divergence.is-info { background: var(--info); box-shadow: 0 0 0 4px rgba(10, 110, 132, 0.10); }
 
 .tracker-card__notes {
-  display: inline-flex; align-items: center; gap: 6px;
-  height: 24px;
-  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 var(--s-2);
   margin: 0;
   border: 0;
   background: transparent;
-  border-radius: 999px;
+  border-radius: var(--r-1);
   font: inherit;
-  font-size: 11.5px; font-weight: 500;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-xs);
   color: var(--ink-3);
   cursor: pointer;
-  transition: background-color 140ms var(--ease-out), color 140ms var(--ease-out);
+  transition:
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out);
 }
-.tracker-card__notes:hover { background: var(--surface-2); color: var(--ink); }
-.tracker-card__notes svg { width: 13px; height: 13px; }
-.tracker-card__notes.has-notes { color: var(--ink-2); }
-.tracker-card__notes.is-active { background: var(--accent-soft); color: var(--ink); }
-.tracker-card__notes:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 2px; }
+.tracker-card__notes:hover {
+  background: var(--surface-active);
+  color: var(--ink);
+}
+.tracker-card__notes.has-notes {
+  color: var(--ink-2);
+}
+.tracker-card__notes.is-active {
+  background: var(--accent-tint);
+  color: var(--ink);
+}
 
+/* ---- Drag states -------------------------------------------------------- */
+/* The original card while dragging — a faint ghost left behind. */
+.tracker-card.is-dragging {
+  opacity: 0.4;
+}
+/* The DragOverlay clone that follows the pointer. */
 .tracker-card.tracker-card--drag-overlay {
   background: var(--surface);
   box-shadow: var(--shadow-drag);
-  transform: rotate(-1.2deg) scale(1.02);
+  cursor: grabbing;
+  transform: rotate(-1deg) scale(1.02);
 }
 
 @media (max-width: 720px) {
-  .tracker-card { padding: 16px 18px 14px; }
-  .tracker-card__title { font-size: 15.5px; line-height: 1.3; }
-  .tracker-card__preview { font-size: 13px; }
+  .tracker-card {
+    padding: var(--s-3) var(--s-3) 11px;
+  }
 }
