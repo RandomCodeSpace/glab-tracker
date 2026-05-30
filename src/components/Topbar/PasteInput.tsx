@@ -1,4 +1,5 @@
 import { useState, type KeyboardEvent } from "react";
+import { Icon } from "../Icon";
 
 export interface PasteInputProps {
   onSubmit: (url: string) => void;
@@ -16,6 +17,7 @@ export function PasteInput({ onSubmit }: PasteInputProps) {
   };
   return (
     <label className="tracker-paste">
+      <Icon name="link-external" size={14} aria-hidden />
       <input
         value={value}
         placeholder="Paste a GitLab issue URL to fork…"
@@ -23,7 +25,6 @@ export function PasteInput({ onSubmit }: PasteInputProps) {
         onKeyDown={onKey}
         type="url"
       />
-      <span className="tracker-paste__kbd">⌘K</span>
     </label>
   );
 }

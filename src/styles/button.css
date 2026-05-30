@@ -1,93 +1,203 @@
+/* ============================================================
+   Button system — light-mode terminal/IDE.
+   Base .tracker-btn = default/secondary (surface + hairline).
+   Modifiers: --primary, --ghost, --danger, --small.
+   Icon-only: .tracker-iconbtn (+ --danger).
+   ============================================================ */
+
 .tracker-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: var(--s-2);
   height: 32px;
-  padding: 0 14px;
-  border: 0;
-  border-radius: var(--r-1);
+  padding: 0 var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
   font: inherit;
-  font-size: 12.5px;
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-size: var(--t-sm);
+  font-weight: var(--fw-semibold);
   letter-spacing: -0.004em;
   color: var(--ink);
-  background: transparent;
+  background: var(--surface);
   cursor: pointer;
-  transition: background-color 160ms var(--ease-out), color 160ms var(--ease-out),
-              box-shadow 160ms var(--ease-out), transform 120ms var(--ease-out), opacity 120ms var(--ease-out);
+  transition: background-color var(--dur-2) var(--ease-out),
+              color var(--dur-2) var(--ease-out),
+              border-color var(--dur-2) var(--ease-out),
+              box-shadow var(--dur-2) var(--ease-out),
+              transform var(--dur-1) var(--ease-out);
   white-space: nowrap;
   -webkit-user-select: none;
   user-select: none;
 }
-.tracker-btn:focus-visible {
-  outline: 2px solid var(--accent-ring);
-  outline-offset: 2px;
+.tracker-btn:hover {
+  background: var(--surface-hover);
+  border-color: var(--line-2);
 }
-.tracker-btn:active { transform: scale(0.985); }
+.tracker-btn:active {
+  background: var(--surface-active);
+  transform: translateY(0.5px) scale(0.99);
+}
+.tracker-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
 .tracker-btn:disabled,
 .tracker-btn[aria-disabled="true"] {
-  opacity: 0.5;
+  color: var(--ink-4);
+  background: var(--surface);
+  border-color: var(--line);
   cursor: not-allowed;
+  box-shadow: none;
   transform: none;
 }
 .tracker-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
 
+/* ---- Primary: solid accent ---- */
 .tracker-btn--primary {
-  background: var(--ink);
-  color: var(--surface);
-  box-shadow: 0 1px 1px rgba(26, 24, 16, 0.18);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg);
 }
-.tracker-btn--primary:hover { background: #2a2519; }
-.tracker-btn--primary:active { background: #1f1c12; }
+.tracker-btn--primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+.tracker-btn--primary:active {
+  background: var(--accent-active);
+  border-color: var(--accent-active);
+  transform: translateY(0.5px) scale(0.99);
+}
+.tracker-btn--primary:disabled,
+.tracker-btn--primary[aria-disabled="true"] {
+  background: var(--surface-active);
+  border-color: var(--line);
+  color: var(--ink-4);
+}
 
+/* ---- Ghost: transparent, gains a hairline on hover ---- */
 .tracker-btn--ghost {
   background: transparent;
+  border-color: transparent;
   color: var(--ink-2);
 }
-.tracker-btn--ghost:hover { background: var(--surface-2); color: var(--ink); }
+.tracker-btn--ghost:hover {
+  background: var(--surface-hover);
+  border-color: var(--line);
+  color: var(--ink);
+}
+.tracker-btn--ghost:active {
+  background: var(--surface-active);
+  border-color: var(--line);
+}
+.tracker-btn--ghost:disabled,
+.tracker-btn--ghost[aria-disabled="true"] {
+  background: transparent;
+  border-color: transparent;
+  color: var(--ink-4);
+}
 
+/* ---- Danger: tinted by default, solid on a destructive confirm ---- */
 .tracker-btn--danger {
   background: transparent;
+  border-color: var(--blocked-line);
   color: var(--blocked);
 }
-.tracker-btn--danger:hover { background: var(--blocked-soft); }
+.tracker-btn--danger:hover {
+  background: var(--blocked-soft);
+  border-color: var(--blocked);
+}
+.tracker-btn--danger:active {
+  background: var(--blocked-soft);
+  border-color: var(--blocked);
+}
+.tracker-btn--danger:disabled,
+.tracker-btn--danger[aria-disabled="true"] {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--ink-4);
+}
+/* Solid fill for the final destructive confirm action. */
+.tracker-btn--danger.tracker-btn--confirm {
+  background: var(--blocked);
+  border-color: var(--blocked);
+  color: var(--accent-fg);
+}
+.tracker-btn--danger.tracker-btn--confirm:hover {
+  background: #b91c24;
+  border-color: #b91c24;
+}
+.tracker-btn--danger.tracker-btn--confirm:active {
+  background: #a3161d;
+  border-color: #a3161d;
+}
 
+/* ---- Small ---- */
 .tracker-btn--small {
   height: 28px;
-  padding: 0 10px;
-  font-size: 12px;
-  font-weight: 500;
+  padding: 0 var(--s-2);
+  border-radius: var(--r-1);
+  font-size: var(--t-xs);
+  font-weight: var(--fw-medium);
 }
 .tracker-btn--small svg { width: 13px; height: 13px; }
 
+/* ============================================================
+   Icon-only buttons — square, quiet.
+   ============================================================ */
 .tracker-iconbtn {
   width: 32px;
   height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--ink-2);
+  color: var(--ink-3);
   background: transparent;
-  border: 0;
+  border: 1px solid transparent;
   border-radius: var(--r-1);
   cursor: pointer;
   text-decoration: none;
-  transition: background-color 140ms var(--ease-out), color 140ms var(--ease-out);
+  transition: background-color var(--dur-2) var(--ease-out),
+              color var(--dur-2) var(--ease-out),
+              border-color var(--dur-2) var(--ease-out),
+              box-shadow var(--dur-2) var(--ease-out),
+              transform var(--dur-1) var(--ease-out);
 }
-.tracker-iconbtn:hover { background: var(--surface-2); color: var(--ink); }
+.tracker-iconbtn:hover {
+  background: var(--surface-hover);
+  color: var(--ink);
+}
+.tracker-iconbtn:active {
+  background: var(--surface-active);
+  transform: scale(0.96);
+}
 .tracker-iconbtn:focus-visible {
-  outline: 2px solid var(--accent-ring);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--ring);
 }
-.tracker-iconbtn:active { background: var(--surface-2); }
+.tracker-iconbtn:disabled,
+.tracker-iconbtn[aria-disabled="true"] {
+  color: var(--ink-4);
+  background: transparent;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
 .tracker-iconbtn svg { width: 14px; height: 14px; }
-.tracker-iconbtn--danger { color: var(--blocked); }
-.tracker-iconbtn--danger:hover { background: var(--blocked-soft); color: var(--blocked); }
 
+.tracker-iconbtn--danger { color: var(--blocked); }
+.tracker-iconbtn--danger:hover {
+  background: var(--blocked-soft);
+  color: var(--blocked);
+}
+
+/* ============================================================
+   Touch — larger tap targets on small screens.
+   ============================================================ */
 @media (max-width: 720px) {
-  .tracker-btn { height: 36px; padding: 0 16px; font-size: 13.5px; }
-  .tracker-btn--small { height: 30px; padding: 0 12px; font-size: 12.5px; }
+  .tracker-btn { height: 36px; padding: 0 var(--s-4); font-size: var(--t-base); }
+  .tracker-btn--small { height: 30px; padding: 0 var(--s-3); font-size: var(--t-sm); }
   .tracker-iconbtn { width: 36px; height: 36px; }
   .tracker-iconbtn svg { width: 17px; height: 17px; }
 }

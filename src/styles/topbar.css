@@ -1,177 +1,297 @@
+/* ============================================================================
+   TOPBAR + CHROME — solid IDE-style chrome bar.
+   Solid --surface, 1px --line bottom rule, sticky, no blur/gradient.
+   Mono for identifiers/version/counts; Sans for the wordmark + button labels.
+   ========================================================================== */
+
 .tracker-topbar {
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-topbar);
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 18px;
-  background: linear-gradient(to bottom, rgba(232, 225, 206, 0.88), rgba(216, 208, 189, 0.78));
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
-  backdrop-filter: blur(20px) saturate(140%);
+  gap: var(--s-3);
+  padding: var(--s-2) var(--s-4);
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
 }
 
+/* ---- Brand: monoline mark + Geist Sans wordmark + mono project path ------- */
 .tracker-topbar__brand {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 4px 10px 4px 6px;
-  border-radius: var(--r-1);
+  gap: var(--s-2);
+  flex-shrink: 0;
+  min-width: 0;
 }
-.tracker-topbar__brand:hover { background: var(--surface-2); }
 .tracker-topbar__mark {
-  width: 24px; height: 24px;
+  width: 26px;
+  height: 26px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: var(--r-1);
   background: var(--ink);
   color: var(--surface);
   flex-shrink: 0;
 }
-.tracker-topbar__name {
-  font-weight: 600; letter-spacing: -0.01em; font-size: 13.5px; color: var(--ink);
+.tracker-topbar__wordmark {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-semibold);
+  font-size: var(--t-md);
+  letter-spacing: -0.01em;
+  color: var(--ink);
 }
-.tracker-topbar__version {
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--ink-3);
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: var(--surface-2);
-  margin-left: 4px;
-  letter-spacing: 0.01em;
+.tracker-topbar__path {
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 22ch;
+}
+.tracker-topbar__path::before {
+  content: "/";
+  color: var(--ink-4);
+  margin-right: var(--s-1);
 }
 
-.tracker-paste {
-  flex: 1;
-  display: flex;
+/* ---- Command palette trigger: an inert "search field" affordance ---------- */
+.tracker-topbar__command {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  background: var(--surface-2);
+  gap: var(--s-2);
+  height: 32px;
+  min-width: 220px;
+  padding: 0 var(--s-2) 0 var(--s-3);
   border: 1px solid var(--line);
   border-radius: var(--r-2);
-  padding: 0 12px;
-  color: var(--ink-2);
-  transition: border-color 140ms ease, background-color 140ms ease;
+  background: var(--code-bg);
+  color: var(--ink-3);
+  cursor: text;
+  font: inherit;
+  transition: border-color var(--dur-2) var(--ease-out),
+              background-color var(--dur-2) var(--ease-out);
 }
-.tracker-paste:focus-within { border-color: var(--accent-ring); background: var(--surface); }
+.tracker-topbar__command:hover {
+  border-color: var(--line-3);
+  background: var(--surface-hover);
+}
+.tracker-topbar__command:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--ring);
+}
+.tracker-topbar__command svg { color: var(--ink-3); flex-shrink: 0; }
+.tracker-topbar__command-label {
+  font-family: var(--font-sans);
+  font-size: var(--t-sm);
+  color: var(--ink-3);
+  white-space: nowrap;
+  margin-right: var(--s-2);
+}
+.tracker-topbar__command .tracker-kbd { margin-left: auto; }
+
+/* ---- Version pill: mono numerals in a code-bg well ------------------------ */
+.tracker-topbar__version {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--t-xs);
+  font-weight: var(--fw-medium);
+  color: var(--ink-3);
+  padding: 2px var(--s-2);
+  border-radius: var(--r-1);
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  letter-spacing: 0;
+}
+
+/* ---- Paste a GitLab URL: mono input in a code-bg well --------------------- */
+.tracker-paste {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-2);
+  padding: 0 var(--s-3);
+  color: var(--ink-2);
+  transition: border-color var(--dur-2) var(--ease-out),
+              background-color var(--dur-2) var(--ease-out),
+              box-shadow var(--dur-2) var(--ease-out);
+}
+.tracker-paste:focus-within {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: var(--ring);
+}
 .tracker-paste svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--ink-3); }
 .tracker-paste input {
-  flex: 1; background: transparent; border: 0; outline: 0;
-  color: var(--ink); font: inherit; padding: 9px 0;
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+  padding: 8px 0;
 }
-.tracker-paste input::placeholder { color: var(--ink-3); }
-.tracker-paste__kbd {
-  font-family: var(--mono); font-size: 10.5px;
-  color: var(--ink-3); padding: 2px 6px;
-  border-radius: 4px;
-  background: var(--canvas); border: 1px solid var(--line);
-}
+.tracker-paste input::placeholder { color: var(--ink-4); }
 
+/* ---- Status counters: mono tabular chips with a semantic status dot ------- */
 .tracker-counters {
-  display: inline-flex; align-items: center; gap: 2px;
-  padding: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  flex-shrink: 0;
+  padding-left: var(--s-2);
+  margin-left: var(--s-1);
   border-left: 1px solid var(--line);
-  border-right: 1px solid var(--line);
-  margin: 0 4px;
-  transition: padding 200ms ease, gap 200ms ease, background-color 200ms ease, box-shadow 200ms ease;
+  transition: gap var(--dur-3) var(--ease-out);
 }
-.tracker.is-dragging .tracker-counters {
-  padding: 4px;
-  gap: 4px;
-  background: var(--surface);
-  border-radius: 999px;
-  box-shadow: 0 4px 14px rgba(20, 22, 26, 0.06), 0 0 0 1px var(--line-strong);
-}
+.tracker.is-dragging .tracker-counters { gap: var(--s-2); }
 .tracker-counter {
-  display: inline-flex; align-items: center; gap: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
   height: 28px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: transparent; border: 0;
+  padding: 0 var(--s-3);
+  border-radius: var(--r-1);
+  background: var(--surface);
+  border: 1px solid var(--line);
   cursor: pointer;
   color: var(--ink-2);
-  font: inherit;
-  font-size: 11.5px;
-  font-weight: 500;
+  font-family: var(--font-sans);
+  font-size: var(--t-xs);
+  font-weight: var(--fw-medium);
   font-variant-numeric: tabular-nums;
-  transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out), box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out);
+  transition: background-color var(--dur-2) var(--ease-out),
+              color var(--dur-2) var(--ease-out),
+              border-color var(--dur-2) var(--ease-out),
+              box-shadow var(--dur-2) var(--ease-out),
+              transform var(--dur-2) var(--ease-out);
 }
-.tracker-counter:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 2px; }
-.tracker-counter:hover { color: var(--ink); background: var(--surface-2); }
-.tracker-counter__dot { width: 6px; height: 6px; border-radius: 50%; }
-.tracker-counter__num { font-weight: 600; color: var(--ink); font-family: var(--mono); }
-.tracker-counter[data-flag="blocked"] .tracker-counter__dot {
-  background: var(--blocked); box-shadow: 0 0 0 3px var(--blocked-soft);
+.tracker-counter:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
 }
-.tracker-counter[data-flag="reviewing"] .tracker-counter__dot {
-  background: var(--reviewing); box-shadow: 0 0 0 3px var(--reviewing-soft);
+.tracker-counter:hover { color: var(--ink); background: var(--surface-hover); border-color: var(--line-3); }
+.tracker-counter__dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.tracker-counter__num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--fw-semibold);
+  color: var(--ink);
 }
-.tracker-counter[data-flag="cancelled"] .tracker-counter__dot {
-  background: var(--cancelled-mut); box-shadow: 0 0 0 3px var(--surface-2);
+.tracker-counter[data-flag="blocked"] .tracker-counter__dot { background: var(--blocked); }
+.tracker-counter[data-flag="reviewing"] .tracker-counter__dot { background: var(--reviewing); }
+.tracker-counter[data-flag="cancelled"] .tracker-counter__dot { background: var(--cancelled); }
+.tracker-counter.is-active {
+  background: var(--accent-tint);
+  border-color: var(--accent-line);
+  color: var(--ink);
 }
-.tracker-counter.is-active { background: var(--accent-soft); color: var(--ink); }
 .tracker-counter.is-active .tracker-counter__num { color: var(--accent); }
 
+/* Drag-target affordance on counters (drop a card to flag it). */
 .tracker.is-dragging .tracker-counter[data-flag="blocked"] {
-  background: var(--blocked-soft); color: var(--blocked);
-  box-shadow: 0 0 0 1px var(--blocked-glow), 0 6px 20px var(--blocked-glow);
-  transform: scale(1.04);
+  background: var(--blocked-soft); color: var(--blocked); border-color: var(--blocked-line);
 }
 .tracker.is-dragging .tracker-counter[data-flag="blocked"] .tracker-counter__num { color: var(--blocked); }
 .tracker.is-dragging .tracker-counter[data-flag="reviewing"] {
-  background: var(--reviewing-soft); color: var(--reviewing);
-  box-shadow: 0 0 0 1px var(--reviewing-glow), 0 6px 20px var(--reviewing-glow);
-  transform: scale(1.04);
+  background: var(--reviewing-soft); color: var(--reviewing); border-color: var(--reviewing-line);
 }
 .tracker.is-dragging .tracker-counter[data-flag="reviewing"] .tracker-counter__num { color: var(--reviewing); }
 .tracker.is-dragging .tracker-counter[data-flag="cancelled"] {
-  background: var(--cancelled-soft); color: var(--ink-2);
-  box-shadow: 0 0 0 1px var(--cancelled-glow), 0 6px 20px var(--cancelled-glow);
-  transform: scale(1.04);
+  background: var(--cancelled-soft); color: var(--ink-2); border-color: var(--line-2);
 }
 .tracker.is-dragging .tracker-counter.is-hover {
-  transform: scale(1.10);
-  box-shadow: 0 0 0 2px currentColor, 0 8px 28px var(--blocked-glow);
+  transform: scale(1.06);
+  box-shadow: 0 0 0 1px currentColor, var(--shadow-md);
 }
 
-.tracker-topbar__actions { display: inline-flex; align-items: center; gap: 6px; }
+/* ---- Right-side actions --------------------------------------------------- */
+.tracker-topbar__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.tracker-topbar__sync {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  height: 32px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-1);
+  background: var(--surface);
+  color: var(--ink-2);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  font-weight: var(--fw-medium);
+  transition: background-color var(--dur-2) var(--ease-out),
+              color var(--dur-2) var(--ease-out),
+              border-color var(--dur-2) var(--ease-out);
+}
+.tracker-topbar__sync:hover { background: var(--surface-hover); color: var(--ink); border-color: var(--line-3); }
+.tracker-topbar__sync:focus-visible { outline: none; box-shadow: var(--ring); }
+.tracker-topbar__sync:active { background: var(--surface-active); }
+.tracker-topbar__sync svg { flex-shrink: 0; }
 
+/* ============================================================================
+   DRAG HINT — quiet --surface band shown during drag (no gradient).
+   ========================================================================== */
 .tracker-drag-hint {
   display: flex; justify-content: center; align-items: center;
-  gap: 18px;
-  padding: 8px 18px;
+  gap: var(--s-5);
+  padding: var(--s-2) var(--s-4);
   border-bottom: 1px solid var(--line);
-  background: linear-gradient(to bottom, var(--accent-soft), transparent 100%);
-  font-size: 11px;
+  background: var(--surface);
+  font-size: var(--t-xs);
   color: var(--ink-2);
   overflow: hidden;
   max-height: 40px;
-  transition: max-height 200ms ease, padding 200ms ease, opacity 200ms ease;
+  transition: max-height var(--dur-3) var(--ease-out),
+              padding var(--dur-3) var(--ease-out),
+              opacity var(--dur-3) var(--ease-out);
 }
-.tracker-drag-hint strong { color: var(--ink); font-weight: 600; }
+.tracker-drag-hint strong { color: var(--ink); font-weight: var(--fw-semibold); }
 .tracker:not(.is-dragging) .tracker-drag-hint {
   max-height: 0; padding-top: 0; padding-bottom: 0; border-bottom: 0; opacity: 0;
 }
 .tracker.is-dragging .tracker-drag-hint {
-  max-height: 40px; padding-top: 8px; padding-bottom: 8px;
+  max-height: 40px; padding-top: var(--s-2); padding-bottom: var(--s-2);
   border-bottom: 1px solid var(--line); opacity: 1;
 }
 
+/* ============================================================================
+   FILTER RAIL — slim bar; mono "filter:" affordance; removable chips; clear.
+   ========================================================================== */
 .tracker-filterbar {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 18px;
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: var(--s-2) var(--s-4);
   background: var(--surface);
   border-bottom: 1px solid var(--line);
   overflow-x: auto;
+  z-index: var(--z-rail);
 }
 .tracker-filterbar__strip {
-  display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  display: inline-flex; align-items: center; gap: var(--s-2); flex-wrap: wrap;
 }
 .tracker-filterbar__prefix {
-  font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em;
-  color: var(--ink-3); font-weight: 700; padding-right: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0;
+  color: var(--ink-3);
+  font-weight: var(--fw-medium);
+  padding-right: var(--s-1);
 }
 .tracker-filterbar__grow { flex: 1; }
 .tracker-filterbar__create {
@@ -181,40 +301,51 @@
 .tracker-filterbar__create-input {
   appearance: none;
   -webkit-appearance: none;
-  background: var(--surface);
-  border: 1px solid var(--accent-ring);
-  border-radius: 999px;
-  padding: 4px 11px;
-  font: inherit;
-  font-size: 11px;
-  font-weight: 500;
+  background: var(--code-bg);
+  border: 1px solid var(--accent);
+  border-radius: var(--r-1);
+  padding: 4px var(--s-2);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  font-weight: var(--fw-medium);
   color: var(--ink);
   outline: 0;
   min-width: 120px;
+  box-shadow: var(--ring);
 }
-.tracker-filterbar__create-input::placeholder { color: var(--ink-3); }
-.tracker-filterbar__create-input:focus { border-color: var(--accent); }
+.tracker-filterbar__create-input::placeholder { color: var(--ink-4); }
 
+/* ============================================================================
+   RESPONSIVE
+   ========================================================================== */
 @media (max-width: 720px) {
   .tracker-topbar {
     flex-wrap: wrap;
-    padding: 10px 12px;
-    gap: 8px;
-    row-gap: 10px;
+    padding: var(--s-2) var(--s-3);
+    gap: var(--s-2);
+    row-gap: var(--s-2);
   }
   .tracker-topbar__brand { order: 1; }
-  .tracker-topbar__actions { order: 2; margin-left: auto; }
-  .tracker-paste { order: 3; flex: 1 0 100%; }
+  .tracker-topbar__path { max-width: 14ch; }
+  .tracker-topbar__actions { order: 2; }
+  .tracker-topbar__command {
+    order: 3;
+    flex: 1 0 100%;
+    min-width: 0;
+  }
+  .tracker-paste { order: 4; flex: 1 0 100%; }
   .tracker-counters {
-    order: 4;
+    order: 5;
     flex: 1 0 100%;
     margin: 0;
     padding: 0;
     border: 0;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    gap: 4px;
+    gap: var(--s-2);
   }
-  .tracker-counter { padding: 6px 12px; font-size: 12px; }
-  .tracker-filterbar { padding: 8px 12px; gap: 8px; }
+  .tracker-counter { height: 32px; padding: 0 var(--s-3); font-size: var(--t-sm); }
+  .tracker-topbar__sync span { display: none; }
+  .tracker-topbar__sync { padding: 0 var(--s-2); }
+  .tracker-filterbar { padding: var(--s-2) var(--s-3); gap: var(--s-2); }
 }

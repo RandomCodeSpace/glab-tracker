@@ -38,7 +38,7 @@ export function FilterRail({ allLabels, selected, onToggle, onClear, onCreate }:
   return (
     <div className="tracker-filterbar">
       <span className="tracker-filterbar__strip">
-        <span className="tracker-filterbar__prefix">Labels</span>
+        <span className="tracker-filterbar__prefix">filter:</span>
         {userLabels.map((l) => (
           <Chip
             key={l.name}

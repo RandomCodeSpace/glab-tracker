@@ -4,6 +4,8 @@ export interface LogoProps extends Omit<SVGProps<SVGSVGElement>, "name"> {
   size?: number;
 }
 
+// Monoline "lane" mark: three ascending tracks on a 24-grid, single solid
+// fill (currentColor), tight 1.5 radii. No gradients. Reads crisply at ~20px.
 export function Logo({ size = 22, ...rest }: LogoProps) {
   return (
     <svg
@@ -14,9 +16,9 @@ export function Logo({ size = 22, ...rest }: LogoProps) {
       aria-hidden
       {...rest}
     >
-      <rect x="3" y="13" width="4" height="8" rx="1.5" />
-      <rect x="10" y="7" width="4" height="14" rx="1.5" />
-      <rect x="17" y="10" width="4" height="11" rx="1.5" />
+      <rect x="4" y="14" width="3.5" height="6" rx="1.5" />
+      <rect x="10.25" y="9" width="3.5" height="11" rx="1.5" />
+      <rect x="16.5" y="4" width="3.5" height="16" rx="1.5" />
     </svg>
   );
 }
