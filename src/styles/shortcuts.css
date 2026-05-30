@@ -1,1 +1,111 @@
-/* shortcuts.css — Keyboard shortcuts sheet (?). Filled in Phase 4 by the shortcuts-sheet agent. */
+/* shortcuts.css — Keyboard shortcuts sheet (the "?" overlay).
+   Renders inside the shared Modal (md, center): the Modal panel owns the
+   surface, radius, shadow, scroll, and enter/exit transition — this file
+   styles the reference itself. Calm, editor-grade: mono uppercase section
+   headers, a two-column definition grid (description left, keycaps right).
+   Reduced-motion is neutralized globally in tokens.css. */
+
+.tracker-shortcuts {
+  display: flex;
+  flex-direction: column;
+  padding: var(--s-6);
+  gap: var(--s-5);
+}
+
+/* ---- head ---- */
+.tracker-shortcuts__head {
+  display: flex;
+  align-items: center;
+  padding-bottom: var(--s-4);
+  border-bottom: 1px solid var(--line);
+}
+.tracker-shortcuts__eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ---- two-column layout of grouped sections ---- */
+.tracker-shortcuts__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-6) var(--s-8);
+}
+
+.tracker-shortcuts__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  min-width: 0;
+}
+
+.tracker-shortcuts__title {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ---- rows: description left, keycaps right ---- */
+.tracker-shortcuts__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  margin: 0;
+}
+
+.tracker-shortcuts__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--s-4);
+  min-height: 26px;
+}
+
+.tracker-shortcuts__desc {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--ink-2);
+  line-height: 1.4;
+  min-width: 0;
+}
+
+.tracker-shortcuts__keys {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+}
+
+/* alternative caps for one action ("j" or "↓") */
+.tracker-shortcuts__alts {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tracker-shortcuts__or,
+.tracker-shortcuts__then {
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  letter-spacing: 0.04em;
+  color: var(--ink-4);
+}
+
+/* ---- mobile: single column, comfortable wrap ---- */
+@media (max-width: 720px) {
+  .tracker-shortcuts {
+    padding: var(--s-5) var(--s-4);
+  }
+  .tracker-shortcuts__grid {
+    grid-template-columns: 1fr;
+    gap: var(--s-5);
+  }
+}

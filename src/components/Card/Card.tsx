@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import type { Issue } from "../../types/tracker";
 import { CardLabels } from "./CardLabels";
@@ -11,21 +12,40 @@ export interface CardProps {
   onClearFlag?: ((flag: "blocked" | "reviewing") => void) | undefined;
   onOpenNotes?: (() => void) | undefined;
   isActive?: boolean | undefined;
+  isFocused?: boolean | undefined;
 }
 
-export function Card({ issue, webUrl, onSelect, onClearFlag, onOpenNotes, isActive }: CardProps) {
+export function Card({ issue, webUrl, onSelect, onClearFlag, onOpenNotes, isActive, isFocused }: CardProps) {
   const blocked = issue.flags.has("blocked");
   const reviewing = issue.flags.has("reviewing");
   const { setNodeRef, listeners, attributes, isDragging } = useDraggable({
     id: `issue:${issue.iid}`,
     data: { iid: issue.iid, kind: "issue" },
   });
+  const cardRef = useRef<HTMLElement | null>(null);
+  const setRefs = useCallback(
+    (el: HTMLElement | null) => {
+      cardRef.current = el;
+      setNodeRef(el);
+    },
+    [setNodeRef],
+  );
+  // Roving keyboard focus: when this card becomes the focused one, take DOM
+  // focus and scroll it just into view (visible ring + screen-reader follow).
+  useEffect(() => {
+    if (isFocused && cardRef.current) {
+      cardRef.current.focus({ preventScroll: true });
+      cardRef.current.scrollIntoView({ block: "nearest" });
+    }
+  }, [isFocused]);
   return (
     <article
-      ref={setNodeRef}
+      ref={setRefs}
       {...listeners}
       {...attributes}
       className={`tracker-card${isActive ? " is-active" : ""}${isDragging ? " is-dragging" : ""}`}
+      data-iid={issue.iid}
+      data-focused={isFocused || undefined}
       data-blocked={blocked || undefined}
       data-reviewing={reviewing || undefined}
       onClick={onSelect}

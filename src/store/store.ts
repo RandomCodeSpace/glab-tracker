@@ -36,6 +36,8 @@ export interface TrackerState {
   toasts: Toast[];
   /** Drag state. */
   isDragging: boolean;
+  /** iid of the keyboard-focused card on the board (roving focus). */
+  focusedIid: number | null;
 
   setIssues: (issues: Issue[]) => void;
   upsertIssue: (issue: Issue) => void;
@@ -49,6 +51,7 @@ export interface TrackerState {
   pushToast: (t: Omit<Toast, "id">) => string;
   dismissToast: (id: string) => void;
   setDragging: (on: boolean) => void;
+  setFocusedIid: (iid: number | null) => void;
 }
 
 export const useTracker = create<TrackerState>((set) => ({
@@ -61,6 +64,7 @@ export const useTracker = create<TrackerState>((set) => ({
   ordering: {},
   toasts: [],
   isDragging: false,
+  focusedIid: null,
 
   setIssues: (issues) =>
     set(() => ({ issues: new Map(issues.map((i) => [i.iid, i])) })),
@@ -83,4 +87,5 @@ export const useTracker = create<TrackerState>((set) => ({
   dismissToast: (id) =>
     set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
   setDragging: (on) => set({ isDragging: on }),
+  setFocusedIid: (iid) => set({ focusedIid: iid }),
 }));

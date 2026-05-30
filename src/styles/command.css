@@ -1,1 +1,191 @@
-/* command.css — Command palette (Ctrl+K). Filled in Phase 4 by the command-palette agent. */
+/* command.css — Command palette (Ctrl+K). The hero IDE element: an
+ * editor-command-line launcher rendered inside the shared Modal shell.
+ * Mono-forward, hairline-bordered, syntax-hue accents. Reduced-motion is
+ * neutralized globally in tokens.css. */
+
+.tracker-command {
+  display: flex;
+  flex-direction: column;
+  /* The Modal panel caps height; let the list scroll within it. */
+  max-height: min(560px, calc(100vh - var(--s-12)));
+  min-height: 0;
+}
+
+/* ---- search field (mono input well) ------------------------------------ */
+.tracker-command__search {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 1px solid var(--line);
+}
+
+.tracker-command__search-icon {
+  flex: none;
+  color: var(--ink-3);
+}
+
+.tracker-command__input {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: var(--s-1) 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--t-md);
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+.tracker-command__input::placeholder {
+  color: var(--ink-4);
+  font-family: var(--font-mono);
+}
+.tracker-command__input:focus,
+.tracker-command__input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.tracker-command__esc {
+  flex: none;
+}
+
+/* ---- results list ------------------------------------------------------- */
+.tracker-command__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--s-2) 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-3) transparent;
+}
+.tracker-command__list::-webkit-scrollbar {
+  width: 10px;
+}
+.tracker-command__list::-webkit-scrollbar-thumb {
+  background: var(--line-3);
+  border: 3px solid var(--surface);
+  border-radius: var(--r-full);
+}
+.tracker-command__list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---- group header (mono uppercase eyebrow) ----------------------------- */
+.tracker-command__group + .tracker-command__group {
+  margin-top: var(--s-1);
+}
+.tracker-command__group-head {
+  padding: var(--s-2) var(--s-4) var(--s-1);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* ---- row ---------------------------------------------------------------- */
+.tracker-command__row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-2) var(--s-4);
+  margin: 0 var(--s-2);
+  border-radius: var(--r-2);
+  color: var(--ink-2);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--dur-1) var(--ease-out);
+}
+.tracker-command__row.is-active {
+  background: var(--accent-tint);
+  color: var(--ink);
+}
+
+/* leading command icon */
+.tracker-command__icon {
+  flex: none;
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-3);
+}
+.tracker-command__row.is-active .tracker-command__icon {
+  color: var(--accent);
+}
+
+/* mono #iid badge on "Jump to" rows */
+.tracker-command__iid {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+
+.tracker-command__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--t-base);
+}
+
+/* right-aligned mono hint */
+.tracker-command__hint {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-4);
+}
+
+/* matched-substring highlight */
+.tracker-command__hit {
+  background: transparent;
+  color: var(--accent);
+  font-weight: var(--fw-semibold);
+}
+.tracker-command__row.is-active .tracker-command__hit {
+  color: var(--accent-active);
+}
+
+/* ---- empty state -------------------------------------------------------- */
+.tracker-command__empty {
+  padding: var(--s-6) var(--s-4);
+  text-align: center;
+  color: var(--ink-3);
+  font-size: var(--t-sm);
+}
+.tracker-command__empty code {
+  font-family: var(--font-mono);
+  color: var(--ink-2);
+  background: var(--code-bg);
+  padding: 1px var(--s-1);
+  border-radius: var(--r-1);
+}
+
+/* ---- status / live region ---------------------------------------------- */
+.tracker-command__status {
+  flex: none;
+  padding: var(--s-2) var(--s-4);
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  letter-spacing: 0.03em;
+  color: var(--ink-4);
+}
+
+@media (max-width: 720px) {
+  .tracker-command {
+    max-height: 80vh;
+  }
+}

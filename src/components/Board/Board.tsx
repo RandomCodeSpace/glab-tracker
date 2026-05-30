@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, type RefObject } from "react";
 import type { Issue, ColumnState } from "../../types/tracker";
 import { Column } from "./Column";
 import { MobileNav } from "./MobileNav";
@@ -11,6 +11,8 @@ const NAMES: Record<ColumnState, string> = {
 export interface BoardProps {
   issues: Issue[];
   selectedIid: number | null;
+  focusedIid: number | null;
+  boardRef?: RefObject<HTMLDivElement | null>;
   webUrlFor: (issue: Issue) => string;
   onSelectIssue: (iid: number) => void;
   onClearFlag: (iid: number, flag: "blocked" | "reviewing") => void;
@@ -28,6 +30,10 @@ function sortIssues(issues: Issue[]): Issue[] {
 
 export function Board(props: BoardProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const setBoardRef = (el: HTMLDivElement | null) => {
+    scrollRef.current = el;
+    if (props.boardRef) props.boardRef.current = el;
+  };
 
   const counts: Record<ColumnState, number> = { todo: 0, doing: 0, done: 0, cancelled: 0 };
   for (const i of props.issues) counts[i.state] += 1;
@@ -35,7 +41,7 @@ export function Board(props: BoardProps) {
   return (
     <div className="tracker-boardwrap">
       <MobileNav order={ORDER} names={NAMES} counts={counts} scrollRef={scrollRef} />
-      <div className="tracker-board" ref={scrollRef}>
+      <div className="tracker-board" ref={setBoardRef}>
         {ORDER.map((s) => {
           const inCol = sortIssues(props.issues.filter((i) => i.state === s));
           return (
@@ -45,6 +51,7 @@ export function Board(props: BoardProps) {
               name={NAMES[s]}
               issues={inCol}
               selectedIid={props.selectedIid}
+              focusedIid={props.focusedIid}
               webUrlFor={props.webUrlFor}
               onSelectIssue={props.onSelectIssue}
               onClearFlag={props.onClearFlag}

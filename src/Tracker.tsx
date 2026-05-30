@@ -24,6 +24,10 @@ import { TrackerContextC, useTrackerCtx, type TrackerCtx } from "./components/Tr
 import { ToastTray } from "./components/Toast/Toast";
 import { NewIssueComposer } from "./components/Composer/NewIssueComposer";
 import { LabelPicker } from "./components/Popovers/LabelPicker";
+import { CommandPalette, type CommandItem } from "./components/Command/CommandPalette";
+import { ShortcutsSheet } from "./components/Command/ShortcutsSheet";
+import { useCommandPalette } from "./hooks/useCommandPalette";
+import { useKeyboardNav } from "./hooks/useKeyboardNav";
 
 type Stage =
   | { kind: "loading" }
@@ -223,12 +227,18 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
   const setFilter = useTracker((s) => s.setFilter);
   const clearFilter = useTracker((s) => s.clearFilter);
   const select = useTracker((s) => s.select);
+  const focusedIid = useTracker((s) => s.focusedIid);
+  const setFocusedIid = useTracker((s) => s.setFocusedIid);
+  const isDragging = useTracker((s) => s.isDragging);
 
   const issuesArr = useMemo(() => Array.from(issues.values()), [issues]);
 
   const [composerOpen, setComposerOpen] = useState(false);
   const [labelPicker, setLabelPicker] = useState<{ rect: DOMRect; iid: number } | null>(null);
   const [confirmSignOut, setConfirmSignOut] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const palette = useCommandPalette();
+  const boardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!composerOpen && !labelPicker && !confirmSignOut) return;
@@ -289,6 +299,53 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
     return () => { cancelled = true; };
   }, [selection?.iid, ctx.api, ctx.personalProjectId]);
 
+  const target = selection?.iid ?? focusedIid;
+  const commands = useMemo<CommandItem[]>(() => {
+    const list: CommandItem[] = [
+      { id: "new", group: "Board", label: "New issue", icon: "plus", keywords: "create add card", run: () => setComposerOpen(true) },
+      { id: "sync", group: "Board", label: "Sync all", icon: "refresh", keywords: "refresh pull gitlab", run: () => { void ctx.actions.syncAll(); } },
+      { id: "clear-filters", group: "Board", label: "Clear filters", icon: "filter", run: () => clearFilter() },
+      { id: "toggle-cancelled", group: "Board", label: filter.showCancelled ? "Hide cancelled" : "Show cancelled", icon: "eye", keywords: "cancelled", run: () => setFilter({ showCancelled: !filter.showCancelled }) },
+      { id: "shortcuts", group: "Board", label: "Keyboard shortcuts", icon: "keyboard", keywords: "help keys", run: () => setShortcutsOpen(true) },
+      { id: "signout", group: "Session", label: "Sign out", icon: "logout", run: () => setConfirmSignOut(true) },
+    ];
+    if (target != null) {
+      const t = target;
+      const issue = issues.get(t);
+      list.push(
+        { id: "state-todo", group: "Card", label: "Set state: To do", icon: "dot", run: () => { void ctx.actions.moveColumn(t, "todo"); } },
+        { id: "state-doing", group: "Card", label: "Set state: In Progress", icon: "dot", run: () => { void ctx.actions.moveColumn(t, "doing"); } },
+        { id: "state-done", group: "Card", label: "Set state: Done", icon: "check", run: () => { void ctx.actions.moveColumn(t, "done"); } },
+        { id: "state-cancelled", group: "Card", label: "Set state: Cancelled", icon: "cancel", run: () => { void ctx.actions.cancelIssue(t); } },
+        { id: "flag-blocked", group: "Card", label: issue?.flags.has("blocked") ? "Clear Blocked" : "Mark Blocked", icon: "block", run: () => { void ctx.actions.toggleFlag(t, "blocked", !issue?.flags.has("blocked")); } },
+        { id: "flag-reviewing", group: "Card", label: issue?.flags.has("reviewing") ? "Clear Reviewing" : "Mark Reviewing", icon: "eye", run: () => { void ctx.actions.toggleFlag(t, "reviewing", !issue?.flags.has("reviewing")); } },
+      );
+    }
+    return list;
+  }, [target, issues, filter.showCancelled, ctx, clearFilter, setFilter]);
+
+  const anyOverlayOpen =
+    composerOpen || !!labelPicker || confirmSignOut || palette.open || shortcutsOpen || !!selection;
+  useKeyboardNav({
+    enabled: !anyOverlayOpen,
+    boardRef,
+    focusedIid,
+    setFocusedIid,
+    isDragging,
+    getState: (iid) => issues.get(iid)?.state,
+    onOpen: (iid) => select({ iid }),
+    onMove: (iid, to) => { void ctx.actions.moveColumn(iid, to); },
+    onToggleFlag: (iid, f) => { void ctx.actions.toggleFlag(iid, f, !issues.get(iid)?.flags.has(f)); },
+    onNewIssue: () => setComposerOpen(true),
+    onFocusFilter: () => {
+      const el = document.querySelector(".tracker-filterbar input");
+      if (el instanceof HTMLElement) el.focus();
+    },
+    onToggleCancelled: () => setFilter({ showCancelled: !filter.showCancelled }),
+    onSync: () => { void ctx.actions.syncAll(); },
+    onShowShortcuts: () => setShortcutsOpen(true),
+  });
+
   return (
     <div className={`tracker ${className ?? ""}`}>
       <Topbar
@@ -300,6 +357,7 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
         onSyncAll={() => { void ctx.actions.syncAll(); }}
         onNewIssue={() => setComposerOpen(true)}
         onSignOut={() => setConfirmSignOut(true)}
+        onOpenCommand={() => palette.setOpen(true)}
       />
       <FilterRail
         allLabels={projectLabels}
@@ -325,6 +383,8 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
           <Board
             issues={filtered}
             selectedIid={selection?.iid ?? null}
+            focusedIid={focusedIid}
+            boardRef={boardRef}
             webUrlFor={webUrlFor}
             onSelectIssue={(iid) => select({ iid })}
             onClearFlag={(iid, flag) => { void ctx.actions.toggleFlag(iid, flag, false); }}
@@ -417,6 +477,14 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
           </div>
         </div>
       )}
+      <CommandPalette
+        open={palette.open}
+        onClose={() => palette.setOpen(false)}
+        commands={commands}
+        issues={issuesArr.map((i) => ({ iid: i.iid, title: i.title, state: i.state }))}
+        onJumpToIssue={(iid) => { select({ iid }); palette.setOpen(false); }}
+      />
+      <ShortcutsSheet open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
       <ToastTray />
     </div>
   );

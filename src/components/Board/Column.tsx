@@ -7,6 +7,7 @@ export interface ColumnProps {
   name: string;
   issues: Issue[];
   selectedIid: number | null;
+  focusedIid: number | null;
   webUrlFor: (issue: Issue) => string;
   onSelectIssue: (iid: number) => void;
   onClearFlag: (iid: number, flag: "blocked" | "reviewing") => void;
@@ -31,6 +32,7 @@ export function Column(props: ColumnProps) {
             issue={i}
             webUrl={props.webUrlFor(i)}
             isActive={props.selectedIid === i.iid}
+            isFocused={props.focusedIid === i.iid}
             onSelect={() => props.onSelectIssue(i.iid)}
             onClearFlag={(f) => props.onClearFlag(i.iid, f)}
             onOpenNotes={() => props.onOpenNotes(i.iid)}
