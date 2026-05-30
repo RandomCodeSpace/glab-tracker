@@ -125,12 +125,12 @@
   color: var(--accent-fg);
 }
 .tracker-btn--danger.tracker-btn--confirm:hover {
-  background: #b91c24;
-  border-color: #b91c24;
+  background: color-mix(in srgb, var(--blocked) 88%, #000);
+  border-color: color-mix(in srgb, var(--blocked) 88%, #000);
 }
 .tracker-btn--danger.tracker-btn--confirm:active {
-  background: #a3161d;
-  border-color: #a3161d;
+  background: color-mix(in srgb, var(--blocked) 78%, #000);
+  border-color: color-mix(in srgb, var(--blocked) 78%, #000);
 }
 
 /* ---- Small ---- */

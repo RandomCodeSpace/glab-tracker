@@ -17,12 +17,9 @@ export function ToastTray() {
     return () => timers.forEach(clearTimeout);
   }, [toasts, dismiss]);
   return (
-    <div
-      className="tracker-toast-tray"
-      role="region"
-      aria-label="Notifications"
-      aria-live="polite"
-    >
+    <div className="tracker-toast-tray">
+      {/* Each toast carries its own role (alert/status) so the announcement is
+          per-severity; a tray-level aria-live would double-announce. */}
       {toasts.map((t) => (
         <div
           key={t.id}

@@ -28,6 +28,7 @@ import { CommandPalette, type CommandItem } from "./components/Command/CommandPa
 import { ShortcutsSheet } from "./components/Command/ShortcutsSheet";
 import { useCommandPalette } from "./hooks/useCommandPalette";
 import { useKeyboardNav } from "./hooks/useKeyboardNav";
+import { Modal } from "./components/common/Modal";
 
 type Stage =
   | { kind: "loading" }
@@ -240,18 +241,16 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
   const palette = useCommandPalette();
   const boardRef = useRef<HTMLDivElement>(null);
 
+  // Composer + confirm own their Esc via <Modal>; the popover handles its own.
+  // This only covers the LabelPicker popover (rendered outside a Modal).
   useEffect(() => {
-    if (!composerOpen && !labelPicker && !confirmSignOut) return;
+    if (!labelPicker) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setComposerOpen(false);
-        setLabelPicker(null);
-        setConfirmSignOut(false);
-      }
+      if (e.key === "Escape") setLabelPicker(null);
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [composerOpen, labelPicker, confirmSignOut]);
+  }, [labelPicker]);
 
   const filtered = useMemo(() => issuesArr.filter((i) => {
     if (i.state === "cancelled" && !filter.showCancelled) return false;
@@ -411,24 +410,17 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
           />
         )}
       </div>
-      {composerOpen && (
-        <div
-          className="tracker-modal"
-          role="dialog"
-          aria-modal="true"
-          onMouseDown={(e) => { if (e.target === e.currentTarget) setComposerOpen(false); }}
-        >
-          <NewIssueComposer
-            allLabels={projectLabels}
-            onCreate={async (input) => {
-              await ctx.actions.createSideIssue(input);
-              setComposerOpen(false);
-            }}
-            onCreateLabel={(name) => ctx.actions.createUserLabel(name)}
-            onCancel={() => setComposerOpen(false)}
-          />
-        </div>
-      )}
+      <Modal open={composerOpen} onClose={() => setComposerOpen(false)} ariaLabel="New issue">
+        <NewIssueComposer
+          allLabels={projectLabels}
+          onCreate={async (input) => {
+            await ctx.actions.createSideIssue(input);
+            setComposerOpen(false);
+          }}
+          onCreateLabel={(name) => ctx.actions.createUserLabel(name)}
+          onCancel={() => setComposerOpen(false)}
+        />
+      </Modal>
       {labelPicker && selected && (
         <LabelPicker
           allLabels={projectLabels}
@@ -448,35 +440,31 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
           onClose={() => setLabelPicker(null)}
         />
       )}
-      {confirmSignOut && (
-        <div
-          className="tracker-modal"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="tracker-confirm-title"
-          onMouseDown={(e) => { if (e.target === e.currentTarget) setConfirmSignOut(false); }}
-        >
-          <div className="tracker-confirm">
-            <h2 id="tracker-confirm-title" className="tracker-confirm__title">Sign out?</h2>
-            <p className="tracker-confirm__body">
-              You'll be signed out as @{ctx.username} and your local token will be cleared. You can sign back in any time.
-            </p>
-            <div className="tracker-confirm__actions">
-              <button
-                type="button"
-                className="tracker-btn tracker-btn--ghost"
-                onClick={() => setConfirmSignOut(false)}
-              >Cancel</button>
-              <button
-                type="button"
-                className="tracker-btn tracker-btn--primary"
-                autoFocus
-                onClick={() => { setConfirmSignOut(false); void ctx.signOut(); }}
-              >Sign out</button>
-            </div>
+      <Modal
+        open={confirmSignOut}
+        onClose={() => setConfirmSignOut(false)}
+        labelledBy="tracker-confirm-title"
+        size="sm"
+      >
+        <div className="tracker-confirm">
+          <h2 id="tracker-confirm-title" className="tracker-confirm__title">Sign out?</h2>
+          <p className="tracker-confirm__body">
+            You'll be signed out as @{ctx.username} and your local token will be cleared. You can sign back in any time.
+          </p>
+          <div className="tracker-confirm__actions">
+            <button
+              type="button"
+              className="tracker-btn tracker-btn--ghost"
+              onClick={() => setConfirmSignOut(false)}
+            >Cancel</button>
+            <button
+              type="button"
+              className="tracker-btn tracker-btn--danger tracker-btn--confirm"
+              onClick={() => { setConfirmSignOut(false); void ctx.signOut(); }}
+            >Sign out</button>
           </div>
         </div>
-      )}
+      </Modal>
       <CommandPalette
         open={palette.open}
         onClose={() => palette.setOpen(false)}

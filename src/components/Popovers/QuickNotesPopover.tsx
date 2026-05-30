@@ -37,7 +37,7 @@ export function QuickNotesPopover({ notes, onSubmit, onViewAll, onClose, anchorR
   const recent = notes.slice(-3).reverse();
 
   return (
-    <div ref={ref} className="tracker-popover tracker-popover--notes" style={positionStyle} role="dialog" aria-label="Quick notes">
+    <div ref={ref} className="tracker-popover" style={positionStyle} role="dialog" aria-label="Quick notes">
       <div className="tracker-popover__head">
         <span className="tracker-popover__title">Notes</span>
         <span className="tracker-popover__count">{notes.length}</span>

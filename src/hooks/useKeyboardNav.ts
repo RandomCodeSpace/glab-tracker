@@ -88,7 +88,13 @@ export function useKeyboardNav(opts: KeyboardNavOptions): void {
       clearG();
 
       const cols = readColumns(board);
-      const focused = o.focusedIid;
+      // Prefer the roving focusedIid; fall back to whatever card the user has
+      // tab-focused, so Tab + Enter/[/]/b/r works without first using j/k.
+      const activeEl = document.activeElement;
+      const activeCardEl =
+        activeEl instanceof HTMLElement ? activeEl.closest<HTMLElement>(".tracker-card[data-iid]") : null;
+      const activeIid = activeCardEl ? Number(activeCardEl.getAttribute("data-iid")) : NaN;
+      const focused = o.focusedIid ?? (Number.isNaN(activeIid) ? null : activeIid);
       const focusedState = focused != null ? o.getState(focused) : undefined;
       const focusIid = (iid: number | undefined) => {
         if (iid != null) o.setFocusedIid(iid);

@@ -5,6 +5,13 @@ import { CardLabels } from "./CardLabels";
 import { CardMeta } from "./CardMeta";
 import { FlagHeader } from "./FlagHeader";
 
+const STATE_LABEL: Record<Issue["state"], string> = {
+  todo: "To do",
+  doing: "In Progress",
+  done: "Done",
+  cancelled: "Cancelled",
+};
+
 export interface CardProps {
   issue: Issue;
   webUrl: string;
@@ -48,6 +55,7 @@ export function Card({ issue, webUrl, onSelect, onClearFlag, onOpenNotes, isActi
       data-focused={isFocused || undefined}
       data-blocked={blocked || undefined}
       data-reviewing={reviewing || undefined}
+      aria-label={`#${issue.iid} ${issue.title} — ${STATE_LABEL[issue.state]}`}
       onClick={onSelect}
     >
       {(blocked || reviewing) && (
