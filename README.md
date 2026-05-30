@@ -73,31 +73,53 @@ The component does not create the personal project for you. Set it up manually o
 
    Bootstrap runs only once per project; subsequent loads detect the labels already exist and skip.
 
-## Theming
+## Theming & fonts
 
-A single in-between cream-on-ink theme ships by default. Override individual tokens by scoping a CSS rule to the `.tracker` selector or to an instance class you pass via the `className` prop:
+Lane ships a single light, terminal/IDE-inspired theme: a crisp "paper" canvas, hairline borders, an electric-indigo accent, and semantic flag hues (blocked red, reviewing teal). Type defaults to **Geist Sans + Geist Mono** (OFL), self-hosted and inlined into the shipped `style.css` — no CDN or runtime network request, so it works offline and air-gapped. Mono is used for every identifier, count, date, and key-hint; Sans for prose and UI.
+
+Override design tokens by scoping a CSS rule to `.tracker` (or to an instance class via the `className` prop):
 
 ```css
 .tracker {
-  --canvas: #yourbg;
-  --surface: #yoursurface;
-  --ink: #yourink;
-  --accent: #youraccent;
-  /* ...etc. — see src/styles/tokens.css in source for the full list */
+  --paper: #yourbg;        /* app canvas */
+  --surface: #yoursurface; /* cards, drawer, popovers */
+  --ink: #yourink;         /* primary text */
+  --accent: #youraccent;   /* primary action / focus ring */
+  /* ...see src/styles/tokens.css for the full token list */
 }
 ```
 
-To scope overrides to a single mount (e.g. when you have other styling that defines `.tracker`):
+To substitute fonts (the bundled Geist faces stay available but unused), override the font hooks:
+
+```css
+.tracker {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+```
+
+Scope overrides to a single mount when your app also defines `.tracker`:
 
 ```tsx
 <Tracker className="my-app-tracker" {/* ...rest */} />
 ```
 
 ```css
-.my-app-tracker.tracker {
-  --accent: #cc4400;
-}
+.my-app-tracker.tracker { --accent: #cc4400; }
 ```
+
+## Keyboard & command palette
+
+Lane is keyboard-first. Key hints render Windows-native (Ctrl / Alt) by default and switch to ⌘ / ⌥ on macOS.
+
+- **Ctrl + K** — command palette: fuzzy-jump to a card, change state, toggle flags, sync, filter, or sign out.
+- **j / k** (or **↓ / ↑**) — move focus between cards; **h / l** (or **← / →**) across columns.
+- **Enter** — open the focused card; **[** / **]** — move it to the previous / next column.
+- **b** / **r** — toggle Blocked / Reviewing on the focused card.
+- **n** — new issue · **/** — focus the filter · **c** — toggle cancelled · **g** then **s** — sync all.
+- **?** — full shortcuts sheet · **Esc** — close any overlay.
+
+Shortcuts are scoped to the `.tracker` root and are ignored while you're typing in a field.
 
 ## Hard rules and warnings
 

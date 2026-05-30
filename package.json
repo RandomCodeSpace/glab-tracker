@@ -61,7 +61,6 @@
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^5.0.0",
     "fake-indexeddb": "^6.2.5",
-    "geist": "^1.7.1",
     "happy-dom": "^20.9.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
