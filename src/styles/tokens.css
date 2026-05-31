@@ -212,16 +212,13 @@
 }
 
 @media (max-width: 720px) {
-  .tracker-paste input,
-  .tracker-filterbar__create-input,
-  .tracker-composer__desc,
-  .tracker-composer__newlabel,
-  .tracker-connect__field input,
-  .tracker-drawer__compose input,
-  .tracker-popover__search input,
-  .tracker-drawer__title-input,
-  .tracker-drawer__desc-input {
-    font-size: 16px; /* iOS zoom guard */
+  /* iOS zooms when a focused field's font-size is < 16px. Blanket-guard every
+     editable control so no input/textarea/select triggers the zoom (replaces a
+     fragile per-selector list that missed the markdown editor and palette). */
+  .tracker input,
+  .tracker textarea,
+  .tracker select {
+    font-size: 16px !important; /* must beat equal-specificity component rules (e.g. .tracker-paste input) */
   }
 }
 

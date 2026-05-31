@@ -136,6 +136,12 @@
   background: var(--surface);
   box-shadow: var(--ring);
 }
+/* The wrapper owns the focus ring — suppress the inner input's global ring so
+   the field shows a single highlight, not a ring-inside-a-ring. */
+.tracker-paste input:focus,
+.tracker-paste input:focus-visible {
+  box-shadow: none;
+}
 .tracker-paste svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--ink-3); }
 .tracker-paste input {
   flex: 1;

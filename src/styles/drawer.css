@@ -431,7 +431,13 @@
   border-radius: var(--r-2);
   transition: border-color var(--dur-1) var(--ease-out);
 }
-.tracker-drawer__compose:focus-within { border-color: var(--accent-line); }
+/* Wrapper owns the focus indicator (solid accent border); suppress the inner
+   textarea's global ring so the field shows a single highlight, not two. */
+.tracker-drawer__compose:focus-within { border-color: var(--accent); }
+.tracker-drawer__compose-input:focus,
+.tracker-drawer__compose-input:focus-visible {
+  box-shadow: none;
+}
 .tracker-drawer__compose-input {
   display: block;
   width: 100%;
