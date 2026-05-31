@@ -5,11 +5,11 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RandomCodeSpace/glab-tracker.git"
+    "url": "git+https://github.com/RandomCodeSpace/lane.git"
   },
-  "homepage": "https://github.com/RandomCodeSpace/glab-tracker#readme",
+  "homepage": "https://github.com/RandomCodeSpace/lane#readme",
   "bugs": {
-    "url": "https://github.com/RandomCodeSpace/glab-tracker/issues"
+    "url": "https://github.com/RandomCodeSpace/lane/issues"
   },
   "publishConfig": {
     "access": "public"
