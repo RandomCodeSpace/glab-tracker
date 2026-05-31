@@ -43,4 +43,17 @@ test.describe("Board rendering", () => {
     await expect(reviewing).toHaveAttribute("data-reviewing", "true");
     await expect(reviewing.locator(".tracker-card__flag-line--reviewing .tracker-card__flag-label")).toHaveText("REVIEWING");
   });
+
+  // Regression: with many issues a column must SCROLL, not crush its cards.
+  // Cards had no flex-shrink, so as flex items in the overflow-y:auto list they
+  // shrank to fit and got compressed/distorted. Guard: cards don't shrink and the
+  // list is the scroll container.
+  test("cards keep their height; the column list scrolls on overflow", async ({ page }) => {
+    const flexShrink = await card(page, 101).evaluate((el) => getComputedStyle(el).flexShrink);
+    expect(flexShrink).toBe("0");
+    const overflowY = await column(page, "todo")
+      .locator(".tracker-col__list")
+      .evaluate((el) => getComputedStyle(el).overflowY);
+    expect(overflowY).toBe("auto");
+  });
 });

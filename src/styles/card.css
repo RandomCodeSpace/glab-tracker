@@ -1,5 +1,6 @@
 .tracker-card {
   position: relative;
+  flex: none; /* keep natural height so the column list scrolls instead of crushing cards */
   background: var(--surface);
   border-radius: var(--r-2);
   padding: 10px var(--s-3) 9px;
