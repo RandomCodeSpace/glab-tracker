@@ -10,12 +10,14 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
 }
 
 /* Board canvas — paper with a faint editor-grade dotted grid behind columns.
    ~24px pitch, ~3% ink alpha; static (no animation). */
 .tracker-board {
   flex: 1;
+  min-height: 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(360px, 1fr));
   gap: var(--s-4);
@@ -32,8 +34,20 @@
   }
 }
 
-/* Columns — transparent panels on the textured canvas; cards carry elevation. */
-.tracker-col { display: flex; flex-direction: column; min-height: 760px; }
+/* Columns — transparent panels on the textured canvas; cards carry elevation.
+   Fill the board height so the card list scrolls internally and the status bar
+   stays pinned to the viewport bottom (no page scroll). */
+.tracker-col { display: flex; flex-direction: column; min-height: 0; position: relative; }
+/* Structural divider between columns — a hairline centred in the grid gap. */
+.tracker-col:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  bottom: var(--s-10);
+  right: calc(-1 * var(--s-4) / 2);
+  width: 1px;
+  background: var(--line);
+}
 
 /* Header as a tab: Sans name + mono count chip, hairline bottom rule. */
 .tracker-col__head {
@@ -65,22 +79,18 @@
 .tracker-col[data-state="done"] .tracker-col__name::before { background: var(--done); }
 .tracker-col[data-state="cancelled"] .tracker-col__name::before { background: var(--cancelled); }
 
-/* Mono count chip — tabular nums, code-bg well, hairline. */
+/* Mono count, bracketed like an editor gutter: [2]. */
 .tracker-col__count {
-  display: inline-flex; align-items: center; justify-content: center;
-  min-width: 20px; height: 18px;
   margin-left: auto;
-  padding: 0 6px;
   font-family: var(--font-mono);
-  font-size: var(--t-meta);
+  font-size: var(--t-sm);
   font-weight: var(--fw-medium);
   color: var(--ink-3);
-  background: var(--code-bg);
-  border: 1px solid var(--line);
-  border-radius: var(--r-1);
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
+.tracker-col__count::before { content: "["; color: var(--ink-4); }
+.tracker-col__count::after { content: "]"; color: var(--ink-4); }
 
 .tracker-col__list {
   display: flex;
@@ -215,4 +225,5 @@
   }
   .tracker-col__head { display: none; }
   .tracker-col__list { gap: var(--s-3); }
+  .tracker-col::after { display: none; }
 }

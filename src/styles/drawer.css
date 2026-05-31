@@ -58,24 +58,52 @@
 .tracker-drawer__state-pill[data-state="done"] { color: var(--done); background: var(--done-soft); }
 .tracker-drawer__state-pill[data-state="cancelled"] { color: var(--cancelled); background: var(--cancelled-soft); }
 
-/* Close button carries an Esc hint to the right of the glyph. */
+/* Close — borderless ghost icon button with a quiet "esc" hint (no keycap box). */
 .tracker-drawer__close {
   display: inline-flex;
   align-items: center;
-  gap: var(--s-2);
-  height: 30px;
+  gap: 6px;
+  height: 28px;
   padding: 0 var(--s-2);
   margin-left: var(--s-1);
-  border: 1px solid var(--line);
+  border: 0;
   border-radius: var(--r-1);
-  background: var(--surface);
-  color: var(--ink-2);
+  background: transparent;
+  color: var(--ink-3);
   cursor: pointer;
-  transition: background var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out);
+  transition: background var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
 }
-.tracker-drawer__close:hover { background: var(--surface-hover); color: var(--ink); border-color: var(--line-2); }
+.tracker-drawer__close:hover { background: var(--surface-active); color: var(--ink); }
 .tracker-drawer__close:focus-visible { outline: none; box-shadow: var(--ring); }
-.tracker-drawer__close svg { width: 14px; height: 14px; }
+.tracker-drawer__close svg { width: 15px; height: 15px; }
+.tracker-drawer__close-key {
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  color: var(--ink-4);
+}
+
+/* ============ Footer — destructive actions, separated from close ============ */
+.tracker-drawer__foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-3) var(--s-4);
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+.tracker-drawer__foot[data-confirm] { background: var(--blocked-soft); }
+.tracker-drawer__foot-grow { flex: 1; }
+.tracker-drawer__foot .tracker-btn svg { width: 14px; height: 14px; }
+.tracker-drawer__foot-confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--blocked);
+}
+.tracker-drawer__foot-confirm svg { width: 14px; height: 14px; }
 
 /* ============ Body ============ */
 .tracker-drawer__body {

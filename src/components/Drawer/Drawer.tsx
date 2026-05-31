@@ -1,11 +1,10 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { Issue, ColumnState, Flag } from "../../types/tracker";
 import { DrawerMeta } from "./DrawerMeta";
 import { Stream, type StreamNote } from "./Stream";
 import { DrawerLabels } from "./DrawerLabels";
 import { DrawerProse } from "./DrawerProse";
 import { Icon } from "../Icon";
-import { Kbd } from "../common/Kbd";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 
 const STATE_LABELS: Record<ColumnState, string> = {
@@ -36,6 +35,7 @@ export function Drawer(p: DrawerProps) {
   const ref = useRef<HTMLElement>(null);
   // Mounted only while open; trap focus and restore it to the opener on unmount.
   useFocusTrap(ref, true);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
     <aside
@@ -46,36 +46,36 @@ export function Drawer(p: DrawerProps) {
       onKeyDown={(e) => {
         if (e.key === "Escape") {
           e.stopPropagation();
-          p.onClose();
+          if (confirmDelete) setConfirmDelete(false);
+          else p.onClose();
         }
       }}
     >
       <div className="tracker-drawer__bar">
         <span className="tracker-drawer__bar-id">#{p.issue.iid}</span>
-        <span
-          className="tracker-drawer__state-pill"
-          data-state={p.issue.state}
-        >
+        <span className="tracker-drawer__state-pill" data-state={p.issue.state}>
           {STATE_LABELS[p.issue.state]}
         </span>
         <span className="tracker-drawer__bar-grow" />
-        <a className="tracker-iconbtn" href={p.webUrl} target="_blank" rel="noopener noreferrer" aria-label="Open in GitLab">
-          <Icon name="external" />
+        <a
+          className="tracker-iconbtn"
+          href={p.webUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open in GitLab"
+          title="Open in GitLab"
+        >
+          <Icon name="link-external" />
         </a>
-        {p.hasSource && (
-          <button type="button" className="tracker-iconbtn" aria-label="Pull source snapshot" onClick={p.onPullSnapshot}>
-            <Icon name="refresh" />
-          </button>
-        )}
-        <button type="button" className="tracker-iconbtn" aria-label="Cancel issue" onClick={p.onCancelIssue}>
-          <Icon name="cancel" />
-        </button>
-        <button type="button" className="tracker-iconbtn tracker-iconbtn--danger" aria-label="Delete issue" onClick={p.onDeleteIssue}>
-          <Icon name="trash" />
-        </button>
-        <button type="button" className="tracker-drawer__close" aria-label="Close" onClick={p.onClose}>
+        <button
+          type="button"
+          className="tracker-drawer__close"
+          aria-label="Close"
+          title="Close (Esc)"
+          onClick={p.onClose}
+        >
           <Icon name="close" />
-          <Kbd keys="esc" />
+          <span className="tracker-drawer__close-key" aria-hidden>esc</span>
         </button>
       </div>
 
@@ -89,6 +89,69 @@ export function Drawer(p: DrawerProps) {
         <DrawerMeta issue={p.issue} onChangeState={p.onChangeState} onToggleFlag={p.onToggleFlag} />
         <DrawerLabels labels={p.issue.userLabels} onAdd={(r) => p.onAddLabel(r)} />
         <Stream notes={p.notes} onAddNote={p.onAddNote} />
+      </div>
+
+      {/* Footer: destructive actions live here, away from the close button, and
+          delete reveals an inline confirm rather than firing immediately. */}
+      <div className="tracker-drawer__foot" data-confirm={confirmDelete || undefined}>
+        {confirmDelete ? (
+          <>
+            <span className="tracker-drawer__foot-confirm">
+              <Icon name="block" />
+              Delete #{p.issue.iid} permanently?
+            </span>
+            <span className="tracker-drawer__foot-grow" />
+            <button
+              type="button"
+              className="tracker-btn tracker-btn--ghost tracker-btn--small"
+              onClick={() => setConfirmDelete(false)}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="tracker-btn tracker-btn--danger tracker-btn--confirm tracker-btn--small"
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus
+              onClick={() => {
+                setConfirmDelete(false);
+                p.onDeleteIssue();
+              }}
+            >
+              Delete issue
+            </button>
+          </>
+        ) : (
+          <>
+            {p.hasSource && (
+              <button
+                type="button"
+                className="tracker-btn tracker-btn--ghost tracker-btn--small"
+                onClick={p.onPullSnapshot}
+              >
+                <Icon name="refresh" />
+                Pull snapshot
+              </button>
+            )}
+            <span className="tracker-drawer__foot-grow" />
+            <button
+              type="button"
+              className="tracker-btn tracker-btn--ghost tracker-btn--small"
+              onClick={p.onCancelIssue}
+            >
+              <Icon name="cancel" />
+              Cancel issue
+            </button>
+            <button
+              type="button"
+              className="tracker-btn tracker-btn--danger tracker-btn--small"
+              onClick={() => setConfirmDelete(true)}
+            >
+              <Icon name="trash" />
+              Delete
+            </button>
+          </>
+        )}
       </div>
     </aside>
   );

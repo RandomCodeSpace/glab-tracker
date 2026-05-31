@@ -1,0 +1,124 @@
+/* statusbar.css — editor-style statusline pinned to the bottom of the app.
+   Dark chrome against the light board: the strongest "IDE" signal. Monospace,
+   compact, with live counts, sync state, and keyboard affordances. */
+
+.tracker-statusbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  height: 28px;
+  padding: 0 var(--s-3);
+  background: var(--ink);
+  color: #aab0c0;
+  font-family: var(--font-mono);
+  font-size: var(--t-meta);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  border-top: 1px solid #000;
+  user-select: none;
+  position: relative;
+  z-index: var(--z-topbar);
+}
+
+.tracker-statusbar__seg {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.tracker-statusbar__branch {
+  color: #e7e9f0;
+  font-weight: var(--fw-medium);
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tracker-statusbar__branch svg {
+  width: 13px;
+  height: 13px;
+  opacity: 0.7;
+}
+
+.tracker-statusbar__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--ink-4);
+}
+.tracker-statusbar__dot.is-synced {
+  background: #3fbf6b;
+  box-shadow: 0 0 0 3px rgba(63, 191, 107, 0.22);
+}
+.tracker-statusbar__dot.is-syncing {
+  background: #e0b341;
+  animation: tracker-statusbar-pulse 1s var(--ease-in-out) infinite;
+}
+.tracker-statusbar__dot--blocked { background: #ef5a4b; }
+.tracker-statusbar__dot--reviewing { background: #2bb3c0; }
+
+@keyframes tracker-statusbar-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.tracker-statusbar__div {
+  width: 1px;
+  height: 13px;
+  background: rgba(255, 255, 255, 0.13);
+  flex: none;
+}
+
+.tracker-statusbar__grow { flex: 1; }
+
+.tracker-statusbar__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 20px;
+  padding: 0 7px;
+  margin: 0;
+  font: inherit;
+  font-family: var(--font-mono);
+  color: #aab0c0;
+  background: transparent;
+  border: 0;
+  border-radius: var(--r-1);
+  cursor: pointer;
+  transition: background-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
+}
+.tracker-statusbar__btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+.tracker-statusbar__btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--indigo-400);
+}
+
+.tracker-statusbar__key {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #e7e9f0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  padding: 2px 5px;
+  line-height: 1;
+}
+
+.tracker-statusbar__ver { color: #8b92a2; }
+
+@media (max-width: 720px) {
+  .tracker-statusbar {
+    gap: var(--s-2);
+    padding: 0 var(--s-2);
+  }
+  /* Drop secondary segments on small screens; keep branch + counts + palette. */
+  .tracker-statusbar__opt,
+  .tracker-statusbar__ver {
+    display: none;
+  }
+}

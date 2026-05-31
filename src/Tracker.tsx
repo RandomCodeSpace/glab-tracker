@@ -29,6 +29,7 @@ import { ShortcutsSheet } from "./components/Command/ShortcutsSheet";
 import { useCommandPalette } from "./hooks/useCommandPalette";
 import { useKeyboardNav } from "./hooks/useKeyboardNav";
 import { Modal } from "./components/common/Modal";
+import { StatusBar } from "./components/StatusBar";
 
 type Stage =
   | { kind: "loading" }
@@ -240,6 +241,11 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const palette = useCommandPalette();
   const boardRef = useRef<HTMLDivElement>(null);
+  const [syncing, setSyncing] = useState(false);
+  const runSync = () => {
+    setSyncing(true);
+    Promise.resolve(ctx.actions.syncAll()).finally(() => setSyncing(false));
+  };
 
   // Composer + confirm own their Esc via <Modal>; the popover handles its own.
   // This only covers the LabelPicker popover (rendered outside a Modal).
@@ -302,7 +308,7 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
   const commands = useMemo<CommandItem[]>(() => {
     const list: CommandItem[] = [
       { id: "new", group: "Board", label: "New issue", icon: "plus", keywords: "create add card", run: () => setComposerOpen(true) },
-      { id: "sync", group: "Board", label: "Sync all", icon: "refresh", keywords: "refresh pull gitlab", run: () => { void ctx.actions.syncAll(); } },
+      { id: "sync", group: "Board", label: "Sync all", icon: "refresh", keywords: "refresh pull gitlab", run: () => runSync() },
       { id: "clear-filters", group: "Board", label: "Clear filters", icon: "filter", run: () => clearFilter() },
       { id: "toggle-cancelled", group: "Board", label: filter.showCancelled ? "Hide cancelled" : "Show cancelled", icon: "eye", keywords: "cancelled", run: () => setFilter({ showCancelled: !filter.showCancelled }) },
       { id: "shortcuts", group: "Board", label: "Keyboard shortcuts", icon: "keyboard", keywords: "help keys", run: () => setShortcutsOpen(true) },
@@ -341,7 +347,7 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
       if (el instanceof HTMLElement) el.focus();
     },
     onToggleCancelled: () => setFilter({ showCancelled: !filter.showCancelled }),
-    onSync: () => { void ctx.actions.syncAll(); },
+    onSync: () => runSync(),
     onShowShortcuts: () => setShortcutsOpen(true),
   });
 
@@ -353,7 +359,7 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
         username={ctx.username}
         counters={counters}
         onPasteUrl={(u) => { void ctx.actions.forkFromUrl(u); }}
-        onSyncAll={() => { void ctx.actions.syncAll(); }}
+        onSyncAll={runSync}
         onNewIssue={() => setComposerOpen(true)}
         onSignOut={() => setConfirmSignOut(true)}
         onOpenCommand={() => palette.setOpen(true)}
@@ -410,6 +416,15 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
           />
         )}
       </div>
+      <StatusBar
+        projectPath={ctx.ownProjectPath}
+        open={issuesArr.filter((i) => i.state !== "cancelled").length}
+        blocked={counters.blocked}
+        reviewing={counters.reviewing}
+        syncing={syncing}
+        onOpenCommand={() => palette.setOpen(true)}
+        onOpenShortcuts={() => setShortcutsOpen(true)}
+      />
       <Modal open={composerOpen} onClose={() => setComposerOpen(false)} ariaLabel="New issue">
         <NewIssueComposer
           allLabels={projectLabels}

@@ -1,60 +1,63 @@
-/* ============ CHIP — label primitive (light terminal/IDE) ============ */
+/* ============ CHIP — label primitive (light terminal/IDE) ============
+   Restrained "tag" treatment: a small hue swatch + neutral text rather than a
+   filled pastel pill (filled pastels read as candy). Colour lives in the
+   swatch; the name stays ink so a row of labels scans calmly. */
 .tracker-chip {
   display: inline-flex;
   align-items: center;
-  gap: var(--s-1);
-  height: 20px;
-  padding: 0 var(--s-2);
+  gap: 6px;
+  height: 18px;
+  padding: 0 var(--s-1);
+  border: 0;
   border-radius: var(--r-1);
   font: inherit;
   font-size: var(--t-xs);
   font-weight: var(--fw-medium);
   line-height: 1;
-  letter-spacing: -0.004em;
+  letter-spacing: 0;
   white-space: nowrap;
   -webkit-user-select: none;
   user-select: none;
-  border: 0;
-  background: var(--hue-slate-bg);
-  color: var(--hue-slate-fg);
+  background: transparent;
+  color: var(--ink-2);
+  --chip-dot: var(--ink-4);
   transition:
-    background-color var(--dur-2) var(--ease-out),
-    color var(--dur-2) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out),
+    color var(--dur-1) var(--ease-out),
     box-shadow var(--dur-1) var(--ease-out);
 }
 
-/* Only interactive chips get pointer affordances. */
-.tracker-chip[role="button"] {
-  cursor: pointer;
-}
-.tracker-chip[role="button"]:hover {
-  background: color-mix(in srgb, currentColor 10%, var(--surface));
-}
-.tracker-chip:focus-visible {
-  outline: none;
-  box-shadow: var(--ring);
+/* Hue swatch — a small rounded square reads more "legend/tag" than a dot. */
+.tracker-chip::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--chip-dot);
 }
 
-/* ---------- hues (label bg/fg) ---------- */
-.tracker-chip[data-hue="blue"]   { background: var(--hue-blue-bg);   color: var(--hue-blue-fg); }
-.tracker-chip[data-hue="violet"] { background: var(--hue-violet-bg); color: var(--hue-violet-fg); }
-.tracker-chip[data-hue="pink"]   { background: var(--hue-pink-bg);   color: var(--hue-pink-fg); }
-.tracker-chip[data-hue="amber"]  { background: var(--hue-amber-bg);  color: var(--hue-amber-fg); }
-.tracker-chip[data-hue="green"]  { background: var(--hue-green-bg);  color: var(--hue-green-fg); }
-.tracker-chip[data-hue="teal"]   { background: var(--hue-teal-bg);   color: var(--hue-teal-fg); }
-.tracker-chip[data-hue="slate"]  { background: var(--hue-slate-bg);  color: var(--hue-slate-fg); }
+.tracker-chip[role="button"] { cursor: pointer; }
+.tracker-chip[role="button"]:hover { background: var(--surface-active); color: var(--ink); }
+.tracker-chip:focus-visible { outline: none; box-shadow: var(--ring); }
+
+/* ---------- hues (drive the swatch colour) ---------- */
+.tracker-chip[data-hue="blue"]   { --chip-dot: var(--hue-blue-fg); }
+.tracker-chip[data-hue="violet"] { --chip-dot: var(--hue-violet-fg); }
+.tracker-chip[data-hue="pink"]   { --chip-dot: var(--hue-pink-fg); }
+.tracker-chip[data-hue="amber"]  { --chip-dot: var(--hue-amber-fg); }
+.tracker-chip[data-hue="green"]  { --chip-dot: var(--hue-green-fg); }
+.tracker-chip[data-hue="teal"]   { --chip-dot: var(--hue-teal-fg); }
+.tracker-chip[data-hue="slate"]  { --chip-dot: var(--ink-4); }
 
 /* ---------- scoped (scope::value) ---------- */
-.tracker-chip.is-scoped {
-  gap: 0;
-}
+.tracker-chip.is-scoped { gap: 6px; }
 .tracker-chip__scope,
 .tracker-chip__value {
   display: inline-flex;
   align-items: center;
   line-height: 1;
 }
-/* scope dimmed, divided by a thin "::" rendered via ::after */
 .tracker-chip__scope {
   color: var(--ink-3);
   font-weight: var(--fw-regular);
@@ -67,7 +70,7 @@
   font-weight: var(--fw-regular);
 }
 .tracker-chip__value {
-  color: inherit;
+  color: var(--ink-2);
   font-weight: var(--fw-medium);
 }
 
@@ -78,22 +81,18 @@
   justify-content: center;
   width: 12px;
   height: 12px;
-  margin-left: -1px;
   flex: none;
   opacity: 0;
   transition: opacity var(--dur-1) var(--ease-out);
 }
-.tracker-chip.is-selectable.is-selected .tracker-chip__check {
-  opacity: 1;
-}
+.tracker-chip.is-selectable.is-selected .tracker-chip__check { opacity: 1; }
 
-/* ---------- selected ring ---------- */
+/* ---------- selected (filter / picker) ---------- */
 .tracker-chip.is-selected {
-  box-shadow: inset 0 0 0 1px currentColor;
+  background: var(--accent-tint);
+  color: var(--ink);
 }
-.tracker-chip.is-selected:focus-visible {
-  box-shadow: inset 0 0 0 1px currentColor, var(--ring);
-}
+.tracker-chip.is-selected:focus-visible { box-shadow: var(--ring); }
 
 /* ---------- removable (trailing ×) ---------- */
 .tracker-chip__remove {
@@ -108,28 +107,24 @@
   border: 0;
   border-radius: var(--r-1);
   background: transparent;
-  color: currentColor;
+  color: var(--ink-3);
   opacity: 0.55;
   cursor: pointer;
   transition: opacity var(--dur-1) var(--ease-out), background-color var(--dur-1) var(--ease-out);
 }
 .tracker-chip__remove:hover {
   opacity: 1;
-  background: color-mix(in srgb, currentColor 16%, transparent);
+  color: var(--blocked);
+  background: var(--blocked-soft);
 }
 .tracker-chip.is-removable:hover .tracker-chip__remove,
-.tracker-chip.is-removable:focus-within .tracker-chip__remove {
-  opacity: 1;
-}
-.tracker-chip__remove:focus-visible {
-  outline: none;
-  opacity: 1;
-  box-shadow: var(--ring);
-}
+.tracker-chip.is-removable:focus-within .tracker-chip__remove { opacity: 1; }
+.tracker-chip__remove:focus-visible { outline: none; opacity: 1; box-shadow: var(--ring); }
 
-/* ---------- add chip (dashed ghost) ---------- */
+/* ---------- add chip (dashed ghost) — no swatch ---------- */
+.tracker-chip.is-add::before { display: none; }
 .tracker-chip.is-add {
-  height: 20px;
+  height: 18px;
   padding: 0 var(--s-2);
   background: transparent;
   color: var(--ink-3);
@@ -139,18 +134,13 @@
   cursor: pointer;
   transition: color var(--dur-1) var(--ease-out), border-color var(--dur-1) var(--ease-out);
 }
-.tracker-chip.is-add:hover {
-  color: var(--ink);
-  border-color: var(--ink-3);
-}
-.tracker-chip.is-add:focus-visible {
-  outline: none;
-  box-shadow: var(--ring);
-}
+.tracker-chip.is-add:hover { color: var(--ink); border-color: var(--ink-3); }
+.tracker-chip.is-add:focus-visible { outline: none; box-shadow: var(--ring); }
 
-/* ---------- count chip (mono +N overflow) ---------- */
+/* ---------- count chip (mono +N overflow) — no swatch ---------- */
+.tracker-chip.is-count::before { display: none; }
 .tracker-chip.is-count {
-  height: 20px;
+  height: 18px;
   padding: 0 var(--s-1);
   min-width: 20px;
   justify-content: center;
@@ -161,13 +151,6 @@
   font-weight: var(--fw-medium);
   cursor: default;
 }
-.tracker-chip.is-count:not(:disabled) {
-  cursor: pointer;
-}
-.tracker-chip.is-count:not(:disabled):hover {
-  color: var(--ink);
-}
-.tracker-chip.is-count:focus-visible {
-  outline: none;
-  box-shadow: var(--ring);
-}
+.tracker-chip.is-count:not(:disabled) { cursor: pointer; }
+.tracker-chip.is-count:not(:disabled):hover { color: var(--ink); }
+.tracker-chip.is-count:focus-visible { outline: none; box-shadow: var(--ring); }

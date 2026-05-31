@@ -2,7 +2,7 @@
   position: relative;
   background: var(--surface);
   border-radius: var(--r-2);
-  padding: var(--s-3) var(--s-4) 11px;
+  padding: 10px var(--s-3) 9px;
   box-shadow: var(--shadow-sm);
   cursor: grab;
   overflow: hidden;
@@ -121,10 +121,10 @@
 }
 
 .tracker-card__preview {
-  color: var(--ink-2);
+  color: var(--ink-3);
   font-size: var(--t-sm);
   line-height: 1.5;
-  margin: 0 0 var(--s-3);
+  margin: 0 0 var(--s-2);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -135,8 +135,8 @@
 .tracker-card__labels {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--s-1);
-  margin-bottom: var(--s-3);
+  gap: var(--s-2) var(--s-3);
+  margin-bottom: var(--s-2);
 }
 .tracker-card__label-more {
   display: inline-flex;
