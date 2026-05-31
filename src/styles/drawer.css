@@ -3,10 +3,15 @@
    corners, --shadow-drawer, --z-drawer. Mono for ids / timestamps / key-hints;
    Sans for the title and prose. */
 
+/* Desktop: an OVERLAY sheet pinned to the right of the stage — it floats over the
+   board (does not consume flex space, so the board never resizes when it opens). */
 .tracker-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
   width: 560px;
-  flex-shrink: 0;
-  align-self: stretch;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   background: var(--surface);
@@ -38,7 +43,25 @@
   font-size: var(--t-sm);
   font-weight: var(--fw-medium);
   font-variant-numeric: tabular-nums;
-  color: var(--accent);
+  color: var(--accent-text);
+}
+
+/* Breadcrumb path — mono "buffer" header: /group/project › #iid */
+.tracker-drawer__bar-path {
+  min-width: 0;
+  max-width: 30ch;
+  font-family: var(--font-mono);
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tracker-drawer__bar-sep {
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+  color: var(--ink-4);
+  flex: none;
 }
 
 .tracker-drawer__state-pill {
@@ -116,10 +139,24 @@
 }
 
 /* ============ Prose (title + description) ============ */
+/* Editor "buffer" feel: a faint left gutter rule, like a code editor's margin.
+   Decorative (no per-line numbers — that would read as faked); the breadcrumb
+   header + mono ids carry the rest of the metaphor. */
 .tracker-drawer__prose-wrap {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--s-3);
+  padding-left: var(--s-5);
+}
+.tracker-drawer__prose-wrap::before {
+  content: "";
+  position: absolute;
+  left: var(--s-3);
+  top: 2px;
+  bottom: 2px;
+  width: 1px;
+  background: var(--line);
 }
 
 /* Title reads as a heading until focused, then fills a quiet --code-bg well. */
@@ -431,6 +468,7 @@
 @media (max-width: 720px) {
   .tracker-drawer {
     position: fixed;
+    top: auto; /* override the desktop overlay's top:0 — mobile is a bottom sheet */
     left: 0;
     right: 0;
     bottom: 0;

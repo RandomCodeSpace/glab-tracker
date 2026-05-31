@@ -1,0 +1,79 @@
+/* ============================================================================
+   ACTIVITY RAIL — opt-in 48px nav at the left of the stage (VS-Code metaphor).
+   Hidden by default; shown only under .tracker[data-rail="on"]; never on mobile.
+   ========================================================================== */
+
+.tracker-rail {
+  display: none;
+}
+
+.tracker[data-rail="on"] .tracker-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: none;
+  width: 48px;
+  padding: var(--s-2) 0;
+  background: var(--paper);
+  border-right: 1px solid var(--line);
+  z-index: var(--z-rail);
+}
+
+.tracker-rail__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  width: 100%;
+  align-items: center;
+}
+.tracker-rail__spacer {
+  flex: 1;
+}
+
+.tracker-rail__btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: var(--r-2);
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition:
+    color var(--dur-1) var(--ease-out),
+    background-color var(--dur-1) var(--ease-out);
+}
+.tracker-rail__btn:hover {
+  color: var(--ink);
+  background: var(--surface-active);
+}
+.tracker-rail__btn:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+.tracker-rail__btn.is-active {
+  color: var(--accent-text);
+}
+/* Active indicator — accent bar flush to the rail's left edge (active-tab metaphor). */
+.tracker-rail__btn.is-active::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 20px;
+  border-radius: 0 2px 2px 0;
+  background: var(--accent);
+}
+
+@media (max-width: 720px) {
+  .tracker[data-rail="on"] .tracker-rail {
+    display: none;
+  }
+}

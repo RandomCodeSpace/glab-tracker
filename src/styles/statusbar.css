@@ -1,6 +1,7 @@
 /* statusbar.css — editor-style statusline pinned to the bottom of the app.
-   Dark chrome against the light board: the strongest "IDE" signal. Monospace,
-   compact, with live counts, sync state, and keyboard affordances. */
+   Theme-adaptive IDE chrome: slate-1 canvas reads as pinned bottom chrome,
+   slightly darker than the slate-2 cards above. Monospace, compact, with live
+   counts, sync state, and keyboard affordances. AA in both dark and light. */
 
 .tracker-statusbar {
   flex: none;
@@ -9,14 +10,14 @@
   gap: var(--s-3);
   height: 28px;
   padding: 0 var(--s-3);
-  background: var(--ink);
-  color: #aab0c0;
+  background: var(--paper);
+  color: var(--ink-2);
   font-family: var(--font-mono);
   font-size: var(--t-meta);
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.01em;
   line-height: 1;
-  border-top: 1px solid #000;
+  border-top: 1px solid var(--line);
   user-select: none;
   position: relative;
   z-index: var(--z-topbar);
@@ -30,7 +31,7 @@
 }
 
 .tracker-statusbar__branch {
-  color: #e7e9f0;
+  color: var(--ink);
   font-weight: var(--fw-medium);
   max-width: 280px;
   overflow: hidden;
@@ -50,15 +51,22 @@
   background: var(--ink-4);
 }
 .tracker-statusbar__dot.is-synced {
-  background: #3fbf6b;
-  box-shadow: 0 0 0 3px rgba(63, 191, 107, 0.22);
+  background: var(--done);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--done) 25%, transparent);
 }
 .tracker-statusbar__dot.is-syncing {
-  background: #e0b341;
+  background: var(--warn);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--warn) 25%, transparent);
   animation: tracker-statusbar-pulse 1s var(--ease-in-out) infinite;
 }
-.tracker-statusbar__dot--blocked { background: #ef5a4b; }
-.tracker-statusbar__dot--reviewing { background: #2bb3c0; }
+.tracker-statusbar__dot--blocked {
+  background: var(--blocked);
+  box-shadow: 0 0 0 3px var(--blocked-glow);
+}
+.tracker-statusbar__dot--reviewing {
+  background: var(--reviewing);
+  box-shadow: 0 0 0 3px var(--reviewing-glow);
+}
 
 @keyframes tracker-statusbar-pulse {
   0%, 100% { opacity: 1; }
@@ -68,7 +76,7 @@
 .tracker-statusbar__div {
   width: 1px;
   height: 13px;
-  background: rgba(255, 255, 255, 0.13);
+  background: var(--line);
   flex: none;
 }
 
@@ -83,7 +91,7 @@
   margin: 0;
   font: inherit;
   font-family: var(--font-mono);
-  color: #aab0c0;
+  color: var(--ink-2);
   background: transparent;
   border: 0;
   border-radius: var(--r-1);
@@ -91,25 +99,25 @@
   transition: background-color var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
 }
 .tracker-statusbar__btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  background: var(--surface-active);
+  color: var(--ink);
 }
 .tracker-statusbar__btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--indigo-400);
+  box-shadow: var(--ring);
 }
 
 .tracker-statusbar__key {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: #e7e9f0;
-  background: rgba(255, 255, 255, 0.1);
+  color: var(--ink-2);
+  background: var(--code-bg);
   border-radius: 3px;
   padding: 2px 5px;
   line-height: 1;
 }
 
-.tracker-statusbar__ver { color: #8b92a2; }
+.tracker-statusbar__ver { color: var(--ink-3); }
 
 @media (max-width: 720px) {
   .tracker-statusbar {

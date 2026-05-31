@@ -1,0 +1,35 @@
+/* ============================================================================
+   CRT / TERMINAL LAYER — shared primitives + global gates.
+   The scanline overlay itself lives in tokens.css (.tracker[data-crt="on"]::after).
+   This file owns the block cursor and the on/off + reduced-motion behaviour, so
+   components only need to drop a <span class="tracker-caret" aria-hidden /> where
+   a terminal cursor belongs.
+   ========================================================================== */
+
+@keyframes tracker-caret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* Block cursor — phosphor cyan, blinks. Inline; size to the surrounding text. */
+.tracker-caret {
+  display: inline-block;
+  width: 1ch;
+  color: var(--accent-bright);
+  animation: tracker-caret 1.1s steps(1) infinite;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.tracker-caret::before { content: "\2589"; } /* ▉ full block, trimmed to 1ch */
+
+/* CRT OFF: no scanline (gated in tokens.css), no cursor, and the phosphor glow
+   degrades to the plain keyboard focus ring (components read var(--glow-accent)). */
+.tracker[data-crt="off"] { --glow-accent: var(--ring); }
+.tracker[data-crt="off"] .tracker-caret { display: none; }
+
+/* Reduced motion: keep the cursor visible but stop the blink (the global
+   reduced-motion block only neutralises duration, which would hide a steps()
+   blink at its 0%/off frame). */
+@media (prefers-reduced-motion: reduce) {
+  .tracker-caret { animation: none; opacity: 1; }
+}

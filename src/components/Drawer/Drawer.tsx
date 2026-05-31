@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Issue, ColumnState, Flag } from "../../types/tracker";
 import { DrawerMeta } from "./DrawerMeta";
 import { Stream, type StreamNote } from "./Stream";
@@ -17,6 +17,7 @@ const STATE_LABELS: Record<ColumnState, string> = {
 export interface DrawerProps {
   issue: Issue;
   webUrl: string;
+  projectPath?: string;
   hasSource: boolean;
   notes: StreamNote[];
   onClose: () => void;
@@ -36,22 +37,44 @@ export function Drawer(p: DrawerProps) {
   // Mounted only while open; trap focus and restore it to the opener on unmount.
   useFocusTrap(ref, true);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const { onClose } = p;
+
+  // Focus the panel on open so it reads as the active surface (keyboard + SR).
+  useEffect(() => {
+    ref.current?.focus();
+  }, []);
+
+  // Esc closes the drawer regardless of where focus currently sits — the panel
+  // overlays the board, so focus can drift to a card behind it. Defer to any
+  // stacked modal/popover (label picker, composer, palette) so they close first;
+  // when the inline delete-confirm is showing, Esc dismisses that first.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (document.querySelector(".tracker-modal, .tracker-popover")) return;
+      e.preventDefault();
+      if (confirmDelete) setConfirmDelete(false);
+      else onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [confirmDelete, onClose]);
 
   return (
     <aside
       ref={ref}
       className="tracker-drawer"
       role="complementary"
+      tabIndex={-1}
       aria-label={`#${p.issue.iid} — ${p.issue.title}`}
-      onKeyDown={(e) => {
-        if (e.key === "Escape") {
-          e.stopPropagation();
-          if (confirmDelete) setConfirmDelete(false);
-          else p.onClose();
-        }
-      }}
     >
       <div className="tracker-drawer__bar">
+        {p.projectPath && (
+          <>
+            <span className="tracker-drawer__bar-path" title={p.projectPath}>/{p.projectPath}</span>
+            <span className="tracker-drawer__bar-sep" aria-hidden>›</span>
+          </>
+        )}
         <span className="tracker-drawer__bar-id">#{p.issue.iid}</span>
         <span className="tracker-drawer__state-pill" data-state={p.issue.state}>
           {STATE_LABELS[p.issue.state]}

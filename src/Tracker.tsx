@@ -28,8 +28,10 @@ import { CommandPalette, type CommandItem } from "./components/Command/CommandPa
 import { ShortcutsSheet } from "./components/Command/ShortcutsSheet";
 import { useCommandPalette } from "./hooks/useCommandPalette";
 import { useKeyboardNav } from "./hooks/useKeyboardNav";
+import { useUiPrefs, type UiPrefs } from "./hooks/useUiPrefs";
 import { Modal } from "./components/common/Modal";
 import { StatusBar } from "./components/StatusBar";
+import { ActivityRail } from "./components/Rail/ActivityRail";
 
 type Stage =
   | { kind: "loading" }
@@ -48,6 +50,7 @@ export function Tracker(props: TrackerProps) {
   const [reloadId, setReloadId] = useState(0);
   const servicesRef = useRef<Services | null>(null);
   const store = useTracker();
+  const ui = useUiPrefs();
 
   const oauthEnabled = Boolean(props.oauthClientId && props.oauthRedirectUri);
 
@@ -169,10 +172,17 @@ export function Tracker(props: TrackerProps) {
 
   if (stage.kind === "loading") {
     return (
-      <div className={`tracker ${props.className ?? ""}`}>
+      <div
+        className={`tracker ${props.className ?? ""}`}
+        data-theme={ui.theme}
+        data-crt={ui.crt ? "on" : "off"}
+      >
         <div className="tracker-loading" role="status" aria-live="polite">
           <span className="tracker-spinner" aria-hidden />
-          <span className="tracker-loading__text">Loading</span>
+          <span className="tracker-loading__boot">
+            lane ▸ connecting {new URL(props.instanceUrl).host} …
+            <span className="tracker-caret" aria-hidden />
+          </span>
         </div>
         <ToastTray />
       </div>
@@ -180,7 +190,11 @@ export function Tracker(props: TrackerProps) {
   }
   if (stage.kind === "connect") {
     return (
-      <div className={`tracker ${props.className ?? ""}`}>
+      <div
+        className={`tracker ${props.className ?? ""}`}
+        data-theme={ui.theme}
+        data-crt={ui.crt ? "on" : "off"}
+      >
         <ConnectScreen
           step={stage.step}
           username={username}
@@ -215,12 +229,12 @@ export function Tracker(props: TrackerProps) {
 
   return (
     <TrackerContextC.Provider value={stage.ctx}>
-      <ReadyTracker className={props.className} />
+      <ReadyTracker className={props.className} ui={ui} />
     </TrackerContextC.Provider>
   );
 }
 
-function ReadyTracker({ className }: { className?: string | undefined }) {
+function ReadyTracker({ className, ui }: { className?: string | undefined; ui: UiPrefs }) {
   const ctx = useTrackerCtx();
   const issues = useTracker((s) => s.issues);
   const projectLabels = useTracker((s) => s.projectLabels);
@@ -312,6 +326,9 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
       { id: "clear-filters", group: "Board", label: "Clear filters", icon: "filter", run: () => clearFilter() },
       { id: "toggle-cancelled", group: "Board", label: filter.showCancelled ? "Hide cancelled" : "Show cancelled", icon: "eye", keywords: "cancelled", run: () => setFilter({ showCancelled: !filter.showCancelled }) },
       { id: "shortcuts", group: "Board", label: "Keyboard shortcuts", icon: "keyboard", keywords: "help keys", run: () => setShortcutsOpen(true) },
+      { id: "toggle-theme", group: "View", label: ui.theme === "dark" ? "Switch to light theme" : "Switch to dark theme", keywords: "theme dark light appearance", run: () => ui.toggleTheme() },
+      { id: "toggle-crt", group: "View", label: ui.crt ? "Disable CRT texture" : "Enable CRT texture", keywords: "crt scanline texture terminal effect", run: () => ui.toggleCrt() },
+      { id: "toggle-rail", group: "View", label: ui.railOpen ? "Hide activity rail" : "Show activity rail", keywords: "rail sidebar activity bar", run: () => ui.toggleRail() },
       { id: "signout", group: "Session", label: "Sign out", icon: "logout", run: () => setConfirmSignOut(true) },
     ];
     if (target != null) {
@@ -327,7 +344,8 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
       );
     }
     return list;
-  }, [target, issues, filter.showCancelled, ctx, clearFilter, setFilter]);
+  }, [target, issues, filter.showCancelled, ctx, clearFilter, setFilter,
+      ui.theme, ui.crt, ui.railOpen, ui.toggleTheme, ui.toggleCrt, ui.toggleRail]);
 
   const anyOverlayOpen =
     composerOpen || !!labelPicker || confirmSignOut || palette.open || shortcutsOpen || !!selection;
@@ -352,7 +370,12 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
   });
 
   return (
-    <div className={`tracker ${className ?? ""}`}>
+    <div
+      className={`tracker ${className ?? ""}`}
+      data-theme={ui.theme}
+      data-crt={ui.crt ? "on" : "off"}
+      data-rail={ui.railOpen ? "on" : "off"}
+    >
       <Topbar
         projectName="Lane"
         instanceHost={new URL(ctx.instanceUrl).host}
@@ -376,6 +399,20 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
         onCreate={(name) => ctx.actions.createUserLabel(name)}
       />
       <div className={`tracker-stage${selected ? " has-drawer" : ""}`}>
+        <ActivityRail
+          theme={ui.theme}
+          crt={ui.crt}
+          hasSelection={!!selection}
+          onFocusBoard={() => select(null)}
+          onNewIssue={() => setComposerOpen(true)}
+          onFocusFilter={() => {
+            const el = document.querySelector(".tracker-filterbar input");
+            if (el instanceof HTMLElement) el.focus();
+          }}
+          onSync={runSync}
+          onToggleTheme={ui.toggleTheme}
+          onToggleCrt={ui.toggleCrt}
+        />
         <DndOrchestrator
           callbacks={{
             onColumnDrop: (iid, to) => { void ctx.actions.moveColumn(iid, to); },
@@ -401,6 +438,7 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
             key={selected.iid}
             issue={selected}
             webUrl={webUrlFor(selected)}
+            projectPath={ctx.ownProjectPath}
             hasSource={selected.source !== null}
             notes={notes}
             onClose={() => select(null)}
@@ -422,6 +460,10 @@ function ReadyTracker({ className }: { className?: string | undefined }) {
         blocked={counters.blocked}
         reviewing={counters.reviewing}
         syncing={syncing}
+        theme={ui.theme}
+        crt={ui.crt}
+        onToggleTheme={ui.toggleTheme}
+        onToggleCrt={ui.toggleCrt}
         onOpenCommand={() => palette.setOpen(true)}
         onOpenShortcuts={() => setShortcutsOpen(true)}
       />

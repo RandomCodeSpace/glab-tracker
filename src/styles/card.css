@@ -23,7 +23,7 @@
    a 2px accent left-rail + focus ring. data-focused is the Phase 4 hook. */
 .tracker-card.is-active,
 .tracker-card[data-focused] {
-  box-shadow: var(--ring), var(--shadow-md);
+  box-shadow: var(--glow-accent), var(--shadow-md);
 }
 .tracker-card.is-active::before,
 .tracker-card[data-focused]::before {

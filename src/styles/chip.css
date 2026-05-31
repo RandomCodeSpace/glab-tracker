@@ -42,36 +42,54 @@
 .tracker-chip:focus-visible { outline: none; box-shadow: var(--ring); }
 
 /* ---------- hues (drive the swatch colour) ---------- */
-.tracker-chip[data-hue="blue"]   { --chip-dot: var(--hue-blue-fg); }
-.tracker-chip[data-hue="violet"] { --chip-dot: var(--hue-violet-fg); }
-.tracker-chip[data-hue="pink"]   { --chip-dot: var(--hue-pink-fg); }
-.tracker-chip[data-hue="amber"]  { --chip-dot: var(--hue-amber-fg); }
-.tracker-chip[data-hue="green"]  { --chip-dot: var(--hue-green-fg); }
-.tracker-chip[data-hue="teal"]   { --chip-dot: var(--hue-teal-fg); }
-.tracker-chip[data-hue="slate"]  { --chip-dot: var(--ink-4); }
+/* Each hue drives the unscoped swatch (--chip-dot) AND the scoped pill's tint
+   (--chip-soft = scope-segment bg; the value segment derives a stronger tint
+   from --chip-dot via color-mix below). */
+.tracker-chip[data-hue="blue"]   { --chip-dot: var(--hue-blue-fg);   --chip-soft: var(--hue-blue-bg); }
+.tracker-chip[data-hue="violet"] { --chip-dot: var(--hue-violet-fg); --chip-soft: var(--hue-violet-bg); }
+.tracker-chip[data-hue="pink"]   { --chip-dot: var(--hue-pink-fg);   --chip-soft: var(--hue-pink-bg); }
+.tracker-chip[data-hue="amber"]  { --chip-dot: var(--hue-amber-fg);  --chip-soft: var(--hue-amber-bg); }
+.tracker-chip[data-hue="green"]  { --chip-dot: var(--hue-green-fg);  --chip-soft: var(--hue-green-bg); }
+.tracker-chip[data-hue="teal"]   { --chip-dot: var(--hue-teal-fg);   --chip-soft: var(--hue-teal-bg); }
+.tracker-chip[data-hue="slate"]  { --chip-dot: var(--hue-slate-fg);  --chip-soft: var(--hue-slate-bg); }
 
-/* ---------- scoped (scope::value) ---------- */
-.tracker-chip.is-scoped { gap: 6px; }
+/* ---------- scoped → two-tone segmented pill (GitLab-native) ----------
+   `scope` sits on a faint hue tint, `value` on a stronger tint of the same hue,
+   joined as one rounded pill. No swatch dot and no literal "::": the two tones
+   carry the scope relationship. Both text colours are the hue's step-11 (AA on
+   the tint — value verified ~4.9:1). */
+.tracker-chip.is-scoped {
+  gap: var(--s-1);      /* spacing reserved for a leading check / trailing × only */
+  padding: 0;
+  background: transparent;
+}
+.tracker-chip.is-scoped::before { display: none; }
+
+.tracker-chip__pill {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: var(--r-1);
+  overflow: hidden;
+  line-height: 1;
+}
 .tracker-chip__scope,
 .tracker-chip__value {
   display: inline-flex;
   align-items: center;
-  line-height: 1;
+  height: 18px;
+  padding: 0 6px;
+  font-size: var(--t-xs);
+  white-space: nowrap;
 }
 .tracker-chip__scope {
-  color: var(--ink-3);
-  font-weight: var(--fw-regular);
-}
-.tracker-chip__scope::after {
-  content: "::";
-  margin: 0 0.18em;
-  color: var(--ink-4);
-  font-family: var(--font-mono);
-  font-weight: var(--fw-regular);
+  background: var(--chip-soft);
+  color: var(--chip-dot);
+  font-weight: var(--fw-medium);
 }
 .tracker-chip__value {
-  color: var(--ink-2);
-  font-weight: var(--fw-medium);
+  background: color-mix(in srgb, var(--chip-dot) 26%, transparent);
+  color: var(--chip-dot);
+  font-weight: var(--fw-semibold);
 }
 
 /* ---------- selectable (leading check) ---------- */

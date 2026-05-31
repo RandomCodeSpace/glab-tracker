@@ -10,6 +10,10 @@ export interface StatusBarProps {
   syncing: boolean;
   onOpenCommand: () => void;
   onOpenShortcuts: () => void;
+  theme?: "dark" | "light";
+  crt?: boolean;
+  onToggleTheme?: () => void;
+  onToggleCrt?: () => void;
 }
 
 // Editor-style statusline pinned to the bottom: dark chrome, monospace, live
@@ -49,6 +53,30 @@ export function StatusBar(p: StatusBarProps) {
         <kbd className="tracker-statusbar__key">?</kbd>
         <span className="tracker-statusbar__opt">shortcuts</span>
       </button>
+
+      {p.onToggleTheme && (
+        <button
+          type="button"
+          className="tracker-statusbar__btn"
+          title={p.theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+          aria-label={p.theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+          onClick={p.onToggleTheme}
+        >
+          <Icon name="contrast" />
+        </button>
+      )}
+      {p.onToggleCrt && (
+        <button
+          type="button"
+          className="tracker-statusbar__btn"
+          title={p.crt ? "Disable CRT texture" : "Enable CRT texture"}
+          aria-label={p.crt ? "Disable CRT texture" : "Enable CRT texture"}
+          aria-pressed={p.crt}
+          onClick={p.onToggleCrt}
+        >
+          <Icon name="monitor" />
+        </button>
+      )}
 
       <span className="tracker-statusbar__div" aria-hidden />
       <span className="tracker-statusbar__seg tracker-statusbar__ver">lane v{VERSION}</span>

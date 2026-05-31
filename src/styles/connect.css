@@ -7,7 +7,7 @@
   min-height: 100%;
   padding: var(--s-12) var(--s-6) var(--s-12);
   background-color: var(--paper);
-  background-image: radial-gradient(circle, rgba(20, 22, 28, 0.04) 1px, transparent 1px);
+  background-image: radial-gradient(circle, var(--line) 1px, transparent 1px);
   background-size: 24px 24px;
   background-position: -1px -1px;
   overflow-y: auto;
@@ -37,20 +37,32 @@
   box-shadow: var(--shadow-sm);
 }
 .tracker-connect__title {
-  font-family: var(--font-sans);
-  font-size: var(--t-xl);
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: var(--t-lg);
   font-weight: var(--fw-semibold);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   line-height: 1.2;
   margin: 2px 0 4px;
   color: var(--ink);
 }
+/* mono `lane ▸` prompt prefix on the title — terminal output, not a hero */
+.tracker-connect__prompt {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-weight: var(--fw-medium);
+  color: var(--accent-text);
+  white-space: nowrap;
+}
 .tracker-connect__lede {
   color: var(--ink-2);
   margin: 0;
+  font-family: var(--font-mono);
   font-size: var(--t-sm);
   line-height: 1.5;
-  max-width: 44ch;
+  max-width: 56ch;
 }
 
 /* ---- steps as an IDE-style config panel ------------------------------------ */
@@ -60,6 +72,7 @@
   padding: 0;
   list-style: none;
   background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: var(--r-3);
   box-shadow: var(--shadow-md);
 }
@@ -122,7 +135,7 @@
 /* ---- mono code-bg inputs (token + project id) ------------------------------ */
 .tracker-connect__inputwrap {
   display: flex;
-  align-items: stretch;
+  align-items: center;
   background: var(--code-bg);
   border: 1px solid var(--line-3);
   border-radius: var(--r-1);
@@ -130,8 +143,33 @@
 }
 .tracker-connect__inputwrap:focus-within {
   border-color: var(--accent);
-  box-shadow: var(--ring);
+  box-shadow: var(--glow-accent);
 }
+
+/* leading mono `$` shell prompt on the token field */
+.tracker-connect__sigil {
+  flex-shrink: 0;
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 4px 0 12px;
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+  font-weight: var(--fw-medium);
+  color: var(--accent-text);
+  -webkit-user-select: none;
+  user-select: none;
+}
+/* block cursor trailing the empty token field — pull it tight to the text */
+.tracker-connect__inputwrap .tracker-caret {
+  flex-shrink: 0;
+  align-self: center;
+  margin-left: -6px;
+  font-size: var(--t-sm);
+}
+/* The connect shell carries no data-crt attribute, so crt.css's off-gate can't
+   reach this caret. Show it only when CRT is explicitly on; hide otherwise. */
+.tracker:not([data-crt="on"]) .tracker-connect__inputwrap .tracker-caret { display: none; }
 
 .tracker-connect__input {
   flex: 1;
@@ -149,13 +187,14 @@
 .tracker-connect__input::placeholder { color: var(--ink-4); }
 .tracker-connect__input:focus-visible {
   border-color: var(--accent);
-  box-shadow: var(--ring);
+  box-shadow: var(--glow-accent);
 }
 /* token field input sits inside the wrap — drop its own border/radius there */
 .tracker-connect__inputwrap .tracker-connect__input {
   border: 0;
   border-radius: 0;
   background: transparent;
+  padding-left: 4px;
 }
 .tracker-connect__inputwrap .tracker-connect__input:focus-visible {
   box-shadow: none;

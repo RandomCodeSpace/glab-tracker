@@ -65,7 +65,9 @@ export function ConnectScreen(p: ConnectScreenProps) {
           <Logo size={22} />
         </span>
         <div>
-          <h1 className="tracker-connect__title">Connect Lane</h1>
+          <h1 className="tracker-connect__title">
+            <span className="tracker-connect__prompt" aria-hidden>lane&nbsp;▸</span> Connect Lane
+          </h1>
           <p className="tracker-connect__lede">
             A private GitLab project becomes your tracker. Three steps, all local.
           </p>
@@ -94,6 +96,7 @@ export function ConnectScreen(p: ConnectScreenProps) {
             ) : (showTokenForm || !p.oauthEnabled) ? (
               <div className="tracker-connect__token">
                 <div className="tracker-connect__inputwrap">
+                  <span className="tracker-connect__sigil" aria-hidden>$</span>
                   <input
                     className="tracker-connect__input"
                     type="password"
@@ -105,6 +108,7 @@ export function ConnectScreen(p: ConnectScreenProps) {
                     onChange={(e) => setToken(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && submitToken()}
                   />
+                  {!token && <span className="tracker-caret" aria-hidden />}
                   <button
                     type="button"
                     className="tracker-connect__paste"

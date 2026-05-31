@@ -31,7 +31,11 @@ export type IconName =
   | "note"
   | "chevron"
   | "dot"
-  | "git";
+  | "git"
+  // activity rail
+  | "board"
+  | "contrast"
+  | "monitor";
 
 // Every glyph is drawn on a single 16x16 grid, 1.5px stroke, round caps/joins,
 // currentColor, fill="none" — optically centered for editor-grade consistency.
@@ -71,6 +75,9 @@ const PATHS: Record<IconName, string> = {
   chevron: "M6 4l4 4-4 4",
   dot: "M8 7a1 1 0 1 0 0 2 1 1 0 0 0 0-2z",
   git: "M4.5 5.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM4.5 5.5v7M4.5 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM11.5 7a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM11.5 7v.5a3 3 0 0 1-3 3h-4",
+  board: "M2.5 3.5h11v9h-11zM6 3.5v9M10 3.5v9",
+  contrast: "M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM8 2v12",
+  monitor: "M2.5 3.5h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1zM6 14h4M8 12v2",
 };
 
 export interface IconProps extends Omit<SVGProps<SVGSVGElement>, "name"> {

@@ -70,10 +70,10 @@ export function Chip({ name, hue, selected, onClick, selectable, removable, onRe
     >
       {check}
       {isScoped ? (
-        <>
+        <span className="tracker-chip__pill">
           <span className="tracker-chip__scope">{scope}</span>
           <span className="tracker-chip__value">{value}</span>
-        </>
+        </span>
       ) : (
         name
       )}

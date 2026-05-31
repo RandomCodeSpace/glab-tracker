@@ -1,71 +1,67 @@
+@import "./radix/scales.css";
+
 .tracker {
-  color-scheme: light;
+  color-scheme: dark;
 
-  /* ============ NEUTRALS — cool "screen paper", not beige ============ */
-  --paper: #fbfbfc;          /* app canvas */
-  --paper-2: #f5f6f8;        /* board gutter, sunken wells */
-  --surface: #ffffff;        /* cards, drawer, popovers — elevation = pure white */
-  --surface-hover: #f7f8fa;
-  --surface-active: #eff1f4;
-  --code-bg: #f4f5f8;        /* code blocks, key-caps, mono input wells */
+  /* ============ NEUTRALS — Radix slate (dark) ============ */
+  --paper: var(--slate-1);          /* app canvas — near-black navy, not pure black */
+  --paper-2: var(--slate-2);        /* board gutter, sunken wells */
+  --surface: var(--slate-2);        /* cards, drawer, popovers */
+  --surface-raised: var(--slate-3); /* menus, hover target, raised */
+  --surface-hover: var(--slate-3);
+  --surface-active: var(--slate-4);
+  --code-bg: var(--slate-1);        /* code blocks, key-caps, mono input wells */
 
-  --line: #e7e9ee;           /* 1px hairline — does most structural work */
-  --line-2: #dcdfe6;         /* stronger divider */
-  --line-3: #c9cdd6;         /* input borders */
+  --line: var(--slate-a6);          /* 1px hairline — alpha, sits on any depth */
+  --line-2: var(--slate-a7);        /* stronger divider */
+  --line-3: var(--slate-a8);        /* input borders */
 
-  --ink: #14161c;            /* primary text (near-black, slight blue) */
-  --ink-2: #4a4f5c;          /* secondary */
-  --ink-3: #62697a;          /* tertiary / meta — AA on white + code-bg */
-  --ink-4: #6b7280;          /* hints, placeholders, muted — AA on white */
+  --ink: var(--slate-12);           /* primary text */
+  --ink-2: var(--slate-11);         /* secondary — AA on slate-1/2 */
+  --ink-3: var(--slate-10);         /* tertiary / meta */
+  --ink-4: var(--slate-9);          /* hints, placeholders, disabled */
 
-  /* legacy aliases (kept so existing CSS keeps working through the migration) */
+  /* legacy aliases (kept so existing CSS keeps working) */
   --canvas: var(--paper);
   --surface-2: var(--surface-active);
   --line-strong: var(--line-2);
 
-  /* ============ ACCENT — electric indigo (the "keyword" hue) ============ */
-  --indigo-50: #eef0ff;
-  --indigo-100: #e0e3ff;
-  --indigo-200: #c6cbff;
-  --indigo-300: #a2a8ff;
-  --indigo-400: #7b82f5;
-  --indigo-500: #5b5fe6;
-  --indigo-600: #4f46e5;     /* primary — AA on white at ~5.9:1 */
-  --indigo-700: #4338ca;
-  --indigo-800: #3730a3;
+  /* ============ ACCENT — Radix cyan (the "terminal prompt" hue) ============ */
+  --accent: var(--cyan-9);          /* solid fill */
+  --accent-hover: var(--cyan-10);
+  --accent-active: var(--cyan-8);
+  --accent-text: var(--cyan-11);    /* accent AS TEXT on dark (AA) */
+  --accent-bright: var(--cyan-12);  /* cursor / high-emphasis */
+  --accent-fg: var(--slate-1);      /* ink ON the cyan fill */
+  --accent-tint: var(--cyan-a3);
+  --accent-tint-2: var(--cyan-a4);
+  --accent-line: var(--cyan-a7);
+  --accent-ring: var(--cyan-a7);
+  --accent-soft: var(--cyan-a3);    /* legacy name */
+  --accent-a5: var(--cyan-a5);      /* glow inner */
+  --accent-a7: var(--cyan-a7);      /* glow ring */
 
-  --accent: var(--indigo-600);
-  --accent-hover: var(--indigo-700);
-  --accent-active: var(--indigo-800);
-  --accent-fg: #ffffff;
-  --accent-tint: var(--indigo-50);
-  --accent-tint-2: var(--indigo-100);
-  --accent-line: var(--indigo-200);
-  --accent-ring: rgba(79, 70, 229, 0.38);
-  --accent-soft: var(--indigo-50);   /* legacy name */
-
-  /* ============ SEMANTIC / STATE (light syntax palette) ============ */
+  /* ============ SEMANTIC / STATE (Radix dark; dot=9, text=11, soft=a3) ============ */
   --todo: var(--accent);
-  --doing: #7c3aed;          --doing-soft: #f2ebfe;
-  --done: #1a7f37;           --done-soft: #e8f5ec;
-  --cancelled: #6b7280;      --cancelled-soft: #f1f2f4;
-  --cancelled-mut: #6b7280;  --cancelled-glow: rgba(107, 114, 128, 0.22);
+  --doing: var(--cyan-11);          --doing-soft: var(--cyan-a3);
+  --done: var(--grass-9);           --done-text: var(--grass-11);    --done-soft: var(--grass-a3);
+  --cancelled: var(--slate-10);     --cancelled-soft: var(--slate-a3);
+  --cancelled-mut: var(--slate-10); --cancelled-glow: var(--slate-a5);
+  --blocked: var(--red-9);          --blocked-text: var(--red-11);   --blocked-soft: var(--red-a3);
+  --blocked-line: var(--red-a7);    --blocked-glow: var(--red-a5);
+  --reviewing: var(--teal-9);       --reviewing-text: var(--teal-11); --reviewing-soft: var(--teal-a3);
+  --reviewing-line: var(--teal-a7); --reviewing-glow: var(--teal-a5);
+  --warn: var(--amber-9);           --warn-text: var(--amber-11);    --warn-soft: var(--amber-a3);
+  --info: var(--blue-11);
 
-  --blocked: #d1242f;        --blocked-soft: #fdecec;
-  --blocked-line: #f5b5b8;   --blocked-glow: rgba(209, 36, 47, 0.22);
-  --reviewing: #0e7c86;      --reviewing-soft: #e2f3f4;
-  --reviewing-line: #a9dde1; --reviewing-glow: rgba(14, 124, 134, 0.2);
-  --warn: #b45309;           --warn-soft: #fbf1d6;
-  --info: #0e7c86;
-
-  /* ============ LABEL HUES (7) — re-tuned, all AA on white ============ */
-  --hue-blue-bg: #e8f1ff;    --hue-blue-fg: #1860d0;    --hue-blue-on: #ffffff;
-  --hue-violet-bg: #f2ebfe;  --hue-violet-fg: #7c3aed;  --hue-violet-on: #ffffff;
-  --hue-pink-bg: #fce9f3;    --hue-pink-fg: #bf3989;    --hue-pink-on: #ffffff;
-  --hue-amber-bg: #fbf1d6;   --hue-amber-fg: #8a5a00;   --hue-amber-on: #ffffff;
-  --hue-green-bg: #e8f5ec;   --hue-green-fg: #1a7f37;   --hue-green-on: #ffffff;
-  --hue-teal-bg: #e2f3f4;    --hue-teal-fg: #0e7c86;    --hue-teal-on: #ffffff;
-  --hue-slate-bg: #eef0f3;   --hue-slate-fg: #4a4f5c;   --hue-slate-on: #ffffff;
+  /* ============ LABEL HUES (7) — fg=11 / solid=9 / soft=a3 ============ */
+  --hue-blue-bg: var(--blue-a3);    --hue-blue-fg: var(--blue-11);    --hue-blue-on: var(--slate-1);
+  --hue-violet-bg: var(--iris-a3);  --hue-violet-fg: var(--iris-11);  --hue-violet-on: var(--slate-1);
+  --hue-pink-bg: var(--pink-a3);    --hue-pink-fg: var(--pink-11);    --hue-pink-on: var(--slate-1);
+  --hue-amber-bg: var(--amber-a3);  --hue-amber-fg: var(--amber-11);  --hue-amber-on: var(--slate-1);
+  --hue-green-bg: var(--grass-a3);  --hue-green-fg: var(--grass-11);  --hue-green-on: var(--slate-1);
+  --hue-teal-bg: var(--teal-a3);    --hue-teal-fg: var(--teal-11);    --hue-teal-on: var(--slate-1);
+  --hue-slate-bg: var(--slate-a3);  --hue-slate-fg: var(--slate-11);  --hue-slate-on: var(--slate-1);
 
   /* ============ TYPOGRAPHY ============ */
   --sans: "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -97,16 +93,17 @@
   --r-4: 14px;
   --r-full: 999px;
 
-  /* ============ ELEVATION — hairlines first, shadows minimal ============ */
-  --shadow-xs: 0 1px 1px rgba(20, 22, 28, 0.04);
-  --shadow-sm: 0 1px 2px rgba(20, 22, 28, 0.06), 0 0 0 1px var(--line);
-  --shadow-md: 0 4px 12px -2px rgba(20, 22, 28, 0.1), 0 0 0 1px var(--line);
-  --shadow-lg: 0 12px 32px -8px rgba(20, 22, 28, 0.16), 0 0 0 1px var(--line-2);
+  /* ============ ELEVATION — borders first; on dark, shadows are deep + soft ============ */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 1px 0 var(--slate-a2);
+  --shadow-md: 0 6px 16px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--line);
+  --shadow-lg: 0 16px 40px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--line-2);
   --shadow: var(--shadow-md);   /* legacy name */
-  --shadow-drawer: -8px 0 32px -12px rgba(20, 22, 28, 0.18), 0 0 0 1px var(--line);
-  --shadow-drag: 0 16px 36px -6px rgba(20, 22, 28, 0.22), 0 0 0 1px var(--accent-line);
+  --shadow-drawer: -12px 0 40px -16px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--line);
+  --shadow-drag: 0 20px 44px -8px rgba(0, 0, 0, 0.7), 0 0 0 1px var(--accent-line);
   --shadow-pop: var(--shadow-lg);
-  --ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent-ring);
+  --glow-accent: 0 0 0 2px var(--accent-a7), 0 0 14px -2px var(--accent-a5);
+  --ring: 0 0 0 2px var(--paper), 0 0 0 4px var(--accent-line);
 
   /* ============ MOTION ============ */
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -127,12 +124,32 @@
   --z-palette: 60;
   --z-popover: 70;
   --z-toast: 80;
+  --z-crt: 90;
+
+  /* ============ TEXTURE (CRT layer; gated by [data-crt="on"]) ============ */
+  --scanline-opacity: 0.025;
+  --scanline: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, var(--scanline-opacity)) 0 1px,
+    transparent 1px 3px
+  );
+  --grid-dot: radial-gradient(circle, var(--slate-a3) 1px, transparent 1px);
+}
+
+/* ============ LIGHT — secondary theme. Radix light scales swap under this
+   attribute (higher specificity wins); only the few non-scale tokens differ. ====== */
+.tracker[data-theme="light"] {
+  color-scheme: light;
+  --accent-fg: #ffffff;        /* white ink on cyan-9 fill in light mode */
+  --scanline-opacity: 0.02;
+  --shadow-sm: 0 1px 2px rgba(20, 22, 28, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 :where(html, body) {
   height: 100%;
+  height: 100dvh;            /* mobile: track the dynamic viewport, no scroll-below-footer */
   margin: 0;
-  background: #fbfbfc;
+  background: #111113;       /* dark default — avoids a white flash before .tracker paints */
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -142,6 +159,7 @@
 }
 :where(#root) {
   height: 100%;
+  height: 100dvh;
 }
 
 .tracker,
@@ -165,6 +183,19 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+/* CRT scanline overlay — gated by [data-crt="on"]. Absolute (scoped to .tracker,
+   not the whole page) + pointer-events:none + out of flex flow. Static texture;
+   the reduced-motion block leaves it untouched (only animations stop). */
+.tracker[data-crt="on"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-crt);
+  background: var(--scanline);
 }
 
 /* Mono is used for every identifier, numeral, count, date, key-hint, code span. */
@@ -213,6 +244,14 @@
   text-transform: uppercase;
   color: var(--ink-3);
 }
+/* Terminal boot line on the loading screen — lowercase mono, ends in a cursor. */
+.tracker-loading__boot {
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+  letter-spacing: 0;
+  color: var(--ink-3);
+}
+.tracker-loading__boot .tracker-caret { color: var(--accent-bright); }
 .tracker-spinner {
   display: inline-block;
   width: 24px;

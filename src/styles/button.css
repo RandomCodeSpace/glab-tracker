@@ -69,6 +69,9 @@
   border-color: var(--accent-active);
   transform: translateY(0.5px) scale(0.99);
 }
+.tracker-btn--primary:focus-visible {
+  box-shadow: var(--glow-accent);
+}
 .tracker-btn--primary:disabled,
 .tracker-btn--primary[aria-disabled="true"] {
   background: var(--surface-active);
@@ -102,7 +105,7 @@
 .tracker-btn--danger {
   background: transparent;
   border-color: var(--blocked-line);
-  color: var(--blocked);
+  color: var(--blocked-text);
 }
 .tracker-btn--danger:hover {
   background: var(--blocked-soft);
@@ -125,12 +128,12 @@
   color: var(--accent-fg);
 }
 .tracker-btn--danger.tracker-btn--confirm:hover {
-  background: color-mix(in srgb, var(--blocked) 88%, #000);
-  border-color: color-mix(in srgb, var(--blocked) 88%, #000);
+  background: var(--red-10);
+  border-color: var(--red-10);
 }
 .tracker-btn--danger.tracker-btn--confirm:active {
-  background: color-mix(in srgb, var(--blocked) 78%, #000);
-  border-color: color-mix(in srgb, var(--blocked) 78%, #000);
+  background: var(--red-10);
+  border-color: var(--red-10);
 }
 
 /* ---- Small ---- */
@@ -186,10 +189,10 @@
 }
 .tracker-iconbtn svg { width: 14px; height: 14px; }
 
-.tracker-iconbtn--danger { color: var(--blocked); }
+.tracker-iconbtn--danger { color: var(--blocked-text); }
 .tracker-iconbtn--danger:hover {
   background: var(--blocked-soft);
-  color: var(--blocked);
+  color: var(--blocked-text);
 }
 
 /* ============================================================

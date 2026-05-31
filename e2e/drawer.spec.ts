@@ -84,6 +84,35 @@ test.describe("Drawer", () => {
     await expect(page.locator(".tracker-drawer__labels")).not.toContainText("backend");
   });
 
+  // The detail pane overlays the board instead of resizing it: the board keeps
+  // its width when the drawer opens, and the drawer is pinned to the stage's
+  // right edge.
+  test("opening the drawer overlays the board without resizing it", async ({ page }) => {
+    const board = page.locator(".tracker-board");
+    const before = (await board.boundingBox())!.width;
+    await openDrawer(page, 101);
+    const after = (await board.boundingBox())!.width;
+    expect(after).toBe(before); // overlay, not resize: board keeps its width
+    // Drawer is pinned to the right side of the stage (right edges align within a
+    // scrollbar's tolerance).
+    const drawer = (await page.locator(".tracker-drawer").boundingBox())!;
+    const stage = (await page.locator(".tracker-stage").boundingBox())!;
+    expect(drawer.x).toBeGreaterThan(stage.x + stage.width / 2);
+    expect(Math.abs((drawer.x + drawer.width) - (stage.x + stage.width))).toBeLessThanOrEqual(20);
+  });
+
+  // Esc closes the drawer — and does so even when focus is not inside the panel
+  // (it overlays the board, so focus can drift). A document-level listener owns it.
+  test("Escape closes the drawer regardless of focus", async ({ page }) => {
+    await openDrawer(page, 101);
+    // Panel takes focus on open (this also confirms the Esc listener has attached).
+    await expect(page.locator(".tracker-drawer")).toBeFocused();
+    // Drop focus off the panel to prove Esc isn't focus-dependent.
+    await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+    await page.keyboard.press("Escape");
+    await expect(page.locator(".tracker-drawer")).toHaveCount(0);
+  });
+
   // Case 17: toggle Blocked with a reason in the DrawerMeta flag toggle.
   // NOTE: the FlagToggle button has no reason input in the UI — onToggleFlag is
   // called WITHOUT a reason (reason is only set via the sidecar elsewhere). So

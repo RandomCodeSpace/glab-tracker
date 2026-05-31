@@ -72,16 +72,23 @@
   cursor: text;
   font: inherit;
   transition: border-color var(--dur-2) var(--ease-out),
-              background-color var(--dur-2) var(--ease-out);
+              background-color var(--dur-2) var(--ease-out),
+              box-shadow var(--dur-2) var(--ease-out);
 }
-.tracker-topbar__command:hover {
-  border-color: var(--line-3);
-  background: var(--surface-hover);
-}
+.tracker-topbar__command:hover,
 .tracker-topbar__command:focus-visible {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: var(--ring);
+  border-color: var(--accent-line);
+  background: var(--surface-hover);
+  box-shadow: var(--glow-accent);
+}
+/* Mono prompt glyph — idle terminal input: "› search…" */
+.tracker-topbar__command::before {
+  content: "\203A"; /* › single right-angle quote */
+  font-family: var(--font-mono);
+  font-size: var(--t-sm);
+  color: var(--ink-3);
+  flex-shrink: 0;
 }
 .tracker-topbar__command svg { color: var(--ink-3); flex-shrink: 0; }
 .tracker-topbar__command-label {
@@ -89,8 +96,9 @@
   font-size: var(--t-sm);
   color: var(--ink-3);
   white-space: nowrap;
-  margin-right: var(--s-2);
 }
+/* Block cursor sits inline at the end of the label */
+.tracker-topbar__command .tracker-caret { margin-left: calc(var(--s-1) * -1); }
 .tracker-topbar__command .tracker-kbd { margin-left: auto; }
 
 /* ---- Version pill: mono numerals in a code-bg well ------------------------ */

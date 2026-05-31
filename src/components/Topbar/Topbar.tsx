@@ -37,6 +37,7 @@ export function Topbar(props: TopbarProps) {
       >
         <Icon name="search" size={14} />
         <span className="tracker-topbar__command-label">Search or run a command</span>
+        <span className="tracker-caret" aria-hidden />
         <Kbd keys="mod+k" />
       </button>
 

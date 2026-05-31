@@ -3,6 +3,7 @@
   display: flex;
   background: var(--paper);
   min-height: 0;
+  position: relative; /* containing block for the overlay drawer */
 }
 
 .tracker-boardwrap {
@@ -23,7 +24,7 @@
   gap: var(--s-4);
   padding: var(--s-4) var(--s-4) var(--s-6);
   background-color: var(--paper);
-  background-image: radial-gradient(circle, rgba(20, 22, 28, 0.04) 1px, transparent 1px);
+  background-image: var(--grid-dot);
   background-size: 24px 24px;
   background-position: -1px -1px;
 }

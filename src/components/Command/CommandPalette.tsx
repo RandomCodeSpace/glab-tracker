@@ -233,11 +233,9 @@ export function CommandPalette({
     <Modal open={open} onClose={onClose} ariaLabel="Command palette" size="md">
       <div className="tracker-command">
         <div className="tracker-command__search">
-          <Icon
-            name="search"
-            size={16}
-            className="tracker-command__search-icon"
-          />
+          <span className="tracker-command__prompt" aria-hidden>
+            ›
+          </span>
           <input
             ref={inputRef}
             // eslint-disable-next-line jsx-a11y/no-autofocus
@@ -258,6 +256,7 @@ export function CommandPalette({
             autoCapitalize="off"
             spellCheck={false}
           />
+          {query === "" ? <span className="tracker-caret" aria-hidden /> : null}
           <Kbd keys="esc" className="tracker-command__esc" />
         </div>
 

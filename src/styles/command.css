@@ -19,11 +19,22 @@
   gap: var(--s-2);
   padding: var(--s-3) var(--s-4);
   border-bottom: 1px solid var(--line);
+  background: var(--code-bg);
+  transition: box-shadow var(--dur-1) var(--ease-out);
+}
+/* Phosphor: the field glows on focus (input is borderless, so glow the well). */
+.tracker-command__search:focus-within {
+  box-shadow: var(--glow-accent);
 }
 
-.tracker-command__search-icon {
+/* terminal prompt glyph (mono ›) */
+.tracker-command__prompt {
   flex: none;
-  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--t-md);
+  line-height: 1.4;
+  color: var(--accent-text);
+  user-select: none;
 }
 
 .tracker-command__input {
@@ -84,9 +95,9 @@
   font-family: var(--font-mono);
   font-size: var(--t-meta);
   font-weight: var(--fw-medium);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--ink-4);
 }
 
 /* ---- row ---------------------------------------------------------------- */
@@ -105,6 +116,8 @@
 .tracker-command__row.is-active {
   background: var(--accent-tint);
   color: var(--ink);
+  /* 2px phosphor left bar — inset shadow keeps the radius and avoids reflow */
+  box-shadow: inset 2px 0 0 0 var(--accent);
 }
 
 /* leading command icon */
@@ -139,13 +152,16 @@
   font-size: var(--t-base);
 }
 
-/* right-aligned mono hint */
+/* right-aligned mono hint (shortcut / key-hint) */
 .tracker-command__hint {
   flex: none;
   font-family: var(--font-mono);
   font-size: var(--t-xs);
   font-variant-numeric: tabular-nums;
-  color: var(--ink-4);
+  color: var(--ink-3);
+}
+.tracker-command__row.is-active .tracker-command__hint {
+  color: var(--ink-2);
 }
 
 /* matched-substring highlight */
